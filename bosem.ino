@@ -17,14 +17,15 @@ NexText tDimStat = NexText(2, 15, "tDimStat");
 NexButton bUkurDim = NexButton(2, 20, "bUkurDim");
 
 //Panjang internode
-NexNumber tPjg = NexNumber(2, 32, "tTinggi");
+NexNumber tPjg = NexNumber(2, 32, "tPjg");
+NexNumber tPjgTing = NexNumber(2, 36, "tPjgTing");
 NexText tPjgStat = NexText(2, 16, "tPjgStat");
 NexButton addPjg = NexButton(2, 21, "addPjg");
 NexButton minPjg = NexButton(2, 27, "minPjg");
 
 //HDRatio
 NexNumber tHdrat = NexNumber(2, 33, "tHdrat");
-NexText tHdratStat = NexText(2, 17, "HdratStat");
+NexText tHdratStat = NexText(2, 17, "tHdratStat");
 NexButton bUkurHD = NexButton(2, 22, "bUkurHD");
 
 //JmlDaun
@@ -89,33 +90,111 @@ void loop(void)
 //ukur tinggi
 void bUkurTinggiCB(void *ptr) {
   float nilai = sensor.readRangeContinuousMillimeters() / 10;
+  if (nilai >= 30) {
+    tTingStat.setText("L");
+  } else {
+    tTingStat.setText("TL");
+  }
   tTinggi.setValue(nilai);
 }
 
 //ukur diameter
 void bUkurDimCB(void *ptr) {
   int nilai = sensor.readRangeContinuousMillimeters();
+  if (nilai >= 3) {
+    tDimStat.setText("L");
+  } else {
+    tDimStat.setText("TL");
+  }
   tDim.setValue(nilai);
 }
 
 //ukur pjg internode
 void bAddPjgCB(void *ptr) {
+  uint32_t tinggi = 0;
+  tTinggi.getValue(&tinggi);
+
+  uint32_t pjgIn = 0;
+  tPjg.getValue(&pjgIn);
+  pjgIn += 1;
+  tPjg.setValue(pjgIn);
+
+  float nilaiIn = tinggi / pjgIn;
+  tPjgTing.setValue(nilaiIn);
+  if (nilaiIn >= 2 && nilaiIn <= 4.5) {
+    tPjgStat.setText("L");
+  } else {
+    tPjgStat.setText("TL");
+  }
 }
 
 void bMinPjgCB(void *ptr) {
+  uint32_t tinggi = 0;
+  tTinggi.getValue(&tinggi);
+
+  uint32_t pjgIn = 0;
+  tPjg.getValue(&pjgIn);
+  pjgIn -= 1;
+  tPjg.setValue(pjgIn);
+
+  float nilaiIn = tinggi / pjgIn;
+  tPjgTing.setValue(nilaiIn);
+  if (nilaiIn >= 2 && nilaiIn <= 4.5) {
+    tPjgStat.setText("L");
+  } else {
+    tPjgStat.setText("TL");
+  }
 }
 
 //ukur HD Rat
 void bUkurHDCB(void *ptr) {
+  uint32_t nilaiH = 0;
+  tTinggi.getValue(&nilaiH);
+  uint32_t nilaiDim = 0;
+  tDim.getValue(&nilaiDim);
+  float nilaiHD = (nilaiH * 10) / nilaiDim;
+  if (nilaiHD <= 12) {
+    tHdratStat.setText("L");
+  } else {
+    tHdratStat.setText("TL");
+  }
+  tHdrat.setValue(nilaiHD);
 }
 
 //ukur jml daun
 void bAddDaunCB(void *ptr) {
+  uint32_t daun = 0;
+  tJmlDaun.getValue(&daun);
+  daun += 1;
+  tJmlDaun.setValue(daun);
+  if (daun >= 4) {
+    tJmlDaunStat.setText("L");
+  } else {
+    tJmlDaunStat.setText("TL");
+  }
 }
 
 void bMinDaunCB(void *ptr) {
+  uint32_t daun = 0;
+  tJmlDaun.getValue(&daun);
+  daun -= 1;
+  tJmlDaun.setValue(daun);
+  if (daun >= 4) {
+    tJmlDaunStat.setText("L");
+  } else {
+    tJmlDaunStat.setText("TL");
+  }
 }
 
 //ukur Kel.Tanah
 void bUkurKelTanahCB(void *ptr) {
+  int nilai = analogRead(SoilSensor);
+  tKelTanah.setValue(nilai);
+  if (nilai <= 350) {
+    tKelTanahStat.setText("Basah");
+  } else if(nilai <= 700) {
+    tKelTanahStat.setText("Normal");
+  } else if(nilai > 700) {
+    tKelTanahStat.setText("Kering");
+  }
 }
