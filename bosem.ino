@@ -205,6 +205,45 @@ NexButton Analisa5 = NexButton(6, 36, "Analisa");
 NexText tLulus5 = NexText(6, 13, "tLulus");
 //End OF CLONE PT
 
+//EP0077A PP
+//Tinggi
+NexNumber tTinggi6 = NexNumber(7, 30, "tTinggi");
+NexText tTingStat6 = NexText(7, 14, "tTingStat");
+NexButton bUkurTinggi6 = NexButton(7, 19, "bUkurTinggi");
+
+//Diameter
+NexNumber tDim6 = NexNumber(7, 37, "tDim");
+NexText tDimStat6 = NexText(7, 15, "tDimStat");
+NexButton bUkurDim6 = NexButton(7, 20, "bUkurDim");
+
+//Panjang internode
+NexNumber tPjg6 = NexNumber(7, 31, "tPjg");
+NexNumber tPjgTing6 = NexNumber(7, 34, "tPjgTing");
+NexText tPjgStat6 = NexText(7, 16, "tPjgStat");
+NexButton addPjg6 = NexButton(7, 21, "addPjg");
+NexButton minPjg6 = NexButton(7, 27, "minPjg");
+
+//HDRatio
+NexNumber tHdrat6 = NexNumber(7, 32, "tHdrat");
+NexText tHdratStat6 = NexText(7, 17, "tHdratStat");
+NexButton bUkurHD6 = NexButton(7, 22, "bUkurHD");
+
+//JmlDaun
+NexNumber tJmlDaun6 = NexNumber(7, 33, "tJmlDaun");
+NexText tJmlDaunStat6 = NexText(7, 18, "tJmlDaunStat");
+NexButton addDaun6 = NexButton(7, 28, "addDaun");
+NexButton minDaun6 = NexButton(7, 29, "minDaun");
+
+//KelTanah
+NexNumber tKelTanah6 = NexNumber(7, 35, "tKelTanah");
+NexText tKelTanahStat6 = NexText(7, 25, "tKelTanahStat");
+NexButton bUkurKelTanah6 = NexButton(7, 26, "bUkurKelTanah");
+
+//Simpan data
+NexButton bSimpan6 = NexButton(7, 23, "bSimpan");
+NexButton Analisa6 = NexButton(7, 36, "Analisa");
+NexText tLulus6 = NexText(7, 13, "tLulus");
+//End OF EP0077AA PP
 
 //Register Button
 NexTouch *nex_listen_list[] = {
@@ -263,6 +302,17 @@ NexTouch *nex_listen_list[] = {
   &bUkurKelTanah5,
   &Analisa5,
   &bSimpan5,
+  //EP0077AA PP
+  &bUkurTinggi6,
+  &bUkurDim6,
+  &addPjg6,
+  &minPjg6,
+  &bUkurHD6,
+  &addDaun6,
+  &minDaun6,
+  &bUkurKelTanah6,
+  &Analisa6,
+  &bSimpan6,
   NULL
 };
 
@@ -331,6 +381,18 @@ void setup()
   bUkurKelTanah5.attachPop(bUkurKelTanahCB5, &bUkurKelTanah5);
   Analisa5.attachPop(bAnalisaCB5, &Analisa5);
   bSimpan5.attachPop(bSimpanCB5, &bSimpan5);
+
+  //EP0077AA PP
+  bUkurTinggi6.attachPop(bUkurTinggiCB6, &bUkurTinggi5);
+  bUkurDim6.attachPop(bUkurDimCB6, &bUkurDim6);
+  addPjg6.attachPop(bAddPjgCB6, &addPjg6);
+  minPjg6.attachPop(bMinPjgCB6, &minPjg6);
+  bUkurHD6.attachPop(bUkurHDCB6, &bUkurHD6);
+  addDaun6.attachPop(bAddDaunCB6, &addDaun6);
+  minDaun6.attachPop(bMinDaunCB6, &minDaun6);
+  bUkurKelTanah6.attachPop(bUkurKelTanahCB6, &bUkurKelTanah6);
+  Analisa6.attachPop(bAnalisaCB6, &Analisa6);
+  bSimpan6.attachPop(bSimpanCB6, &bSimpan6);
 
   dbSerialPrintln("setup done");
 
@@ -1064,7 +1126,7 @@ void bUkurDimCB5(void *ptr) {
 //ukur pjg internode
 void bAddPjgCB5(void *ptr) {
   uint32_t tinggi = 0;
-  tTinggi4.getValue(&tinggi);
+  tTinggi5.getValue(&tinggi);
 
   uint32_t pjgIn = 0;
   tPjg5.getValue(&pjgIn);
@@ -1208,3 +1270,175 @@ void bSimpanCB5(void *ptr) {
 
 }
 //End Of CLONE PT
+
+//EP0077AA PP
+//ukur tinggi
+void bUkurTinggiCB6(void *ptr) {
+  float nilai = sensor.readRangeContinuousMillimeters() / 10;
+  if (nilai >= 30 && nilai <= 50) {
+    tTingStat6.setText("L");
+  } else {
+    tTingStat6.setText("TL");
+  }
+  tTinggi6.setValue(nilai);
+}
+
+//ukur diameter
+void bUkurDimCB6(void *ptr) {
+  float nilai = sensor.readRangeContinuousMillimeters();
+  nilai = nilai - 30;
+  if (nilai >= 2.3) {
+    tDimStat6.setText("L");
+  } else {
+    tDimStat6.setText("TL");
+  }
+  tDim6.setValue(nilai);
+}
+
+//ukur pjg internode
+void bAddPjgCB6(void *ptr) {
+  uint32_t tinggi = 0;
+  tTinggi6.getValue(&tinggi);
+
+  uint32_t pjgIn = 0;
+  tPjg6.getValue(&pjgIn);
+  pjgIn += 1;
+  tPjg.setValue(pjgIn);
+
+  float nilaiIn = tinggi / pjgIn;
+  tPjgTing6.setValue(nilaiIn);
+  if (nilaiIn >= 1.2 && nilaiIn <= 2.4) {
+    tPjgStat6.setText("L");
+  } else {
+    tPjgStat6.setText("TL");
+  }
+}
+
+void bMinPjgCB6(void *ptr) {
+  uint32_t tinggi = 0;
+  tTinggi6.getValue(&tinggi);
+
+  uint32_t pjgIn = 0;
+  tPjg6.getValue(&pjgIn);
+  pjgIn -= 1;
+  tPjg6.setValue(pjgIn);
+
+  float nilaiIn = tinggi / pjgIn;
+  tPjgTing6.setValue(nilaiIn);
+  if (nilaiIn >= 1.2 && nilaiIn <= 2.4) {
+    tPjgStat6.setText("L");
+  } else {
+    tPjgStat5.setText("TL");
+  }
+}
+
+//ukur HD Rat
+void bUkurHDCB6(void *ptr) {
+  uint32_t nilaiH = 0;
+  tTinggi6.getValue(&nilaiH);
+  uint32_t nilaiDim = 0;
+  tDim6.getValue(&nilaiDim);
+  float nilaiHD = (nilaiH * 10) / nilaiDim;
+  if (nilaiHD <= 11) {
+    tHdratStat6.setText("L");
+  } else {
+    tHdratStat6.setText("TL");
+  }
+  tHdrat6.setValue(nilaiHD);
+}
+
+//ukur jml daun
+void bAddDaunCB6(void *ptr) {
+  uint32_t daun = 0;
+  tJmlDaun6.getValue(&daun);
+  daun += 1;
+  tJmlDaun6.setValue(daun);
+  if (daun >= 5) {
+    tJmlDaunStat6.setText("L");
+  } else {
+    tJmlDaunStat6.setText("TL");
+  }
+}
+
+void bMinDaunCB6(void *ptr) {
+  uint32_t daun = 0;
+  tJmlDaun6.getValue(&daun);
+  daun -= 1;
+  tJmlDaun5.setValue(daun);
+  if (daun >= 5) {
+    tJmlDaunStat6.setText("L");
+  } else {
+    tJmlDaunStat6.setText("TL");
+  }
+}
+
+//ukur Kel.Tanah
+void bUkurKelTanahCB6(void *ptr) {
+  float nilai = (1023 - analogRead(SoilSensor));
+  nilai = nilai / 1023;
+  nilai = nilai * 100;
+  tKelTanah6.setValue(nilai);
+  if (nilai >= 66) {
+    tKelTanahStat6.setText("Basah");
+  } else if (nilai >= 31) {
+    tKelTanahStat6.setText("Normal");
+  } else if (nilai <= 31) {
+    tKelTanahStat6.setText("Kering");
+  }
+}
+
+void bAnalisaCB6(void *ptr) {
+  int L = 0;
+  int TL = 0;
+  uint32_t tinggi = 0;
+  uint32_t diameter = 0;
+  uint32_t panjang = 0;
+  uint32_t hdrat = 0;
+  uint32_t daun = 0;
+
+  tTinggi6.getValue(&tinggi);
+  if (tinggi >= 30 && tinggi <= 50) {
+    L += 1;
+  } else {
+    TL += 1;
+  }
+
+  tDim6.getValue(&diameter);
+  if (diameter >= 2.3) {
+    L += 1;
+  } else {
+    TL += 1;
+  }
+
+  tPjgTing6.getValue(&panjang);
+  if (panjang >= 1.2 && panjang <= 2.4) {
+    L += 1;
+  } else {
+    TL += 1;
+  }
+
+  tHdrat6.getValue(&hdrat);
+  if (hdrat <= 11) {
+    L += 1;
+  } else {
+    TL += 1;
+  }
+
+  tJmlDaun6.getValue(&daun);
+  if (daun >= 5) {
+    L += 1;
+  } else {
+    TL += 1;
+  }
+
+  if (L >= TL) {
+    tLulus6.setText("LULUS");
+  } else {
+    tLulus6.setText("TIDAK LULUS");
+  }
+}
+
+void bSimpanCB6(void *ptr) {
+
+}
+//End Of EP0077AA PP
