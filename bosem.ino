@@ -17,31 +17,31 @@ NexText tDimStat = NexText(2, 15, "tDimStat");
 NexButton bUkurDim = NexButton(2, 20, "bUkurDim");
 
 //Panjang internode
-NexNumber tPjg = NexNumber(2, 32, "tPjg");
-NexNumber tPjgTing = NexNumber(2, 36, "tPjgTing");
+NexNumber tPjg = NexNumber(2, 31, "tPjg");
+NexNumber tPjgTing = NexNumber(2, 34, "tPjgTing");
 NexText tPjgStat = NexText(2, 16, "tPjgStat");
 NexButton addPjg = NexButton(2, 21, "addPjg");
 NexButton minPjg = NexButton(2, 27, "minPjg");
 
 //HDRatio
-NexNumber tHdrat = NexNumber(2, 33, "tHdrat");
+NexNumber tHdrat = NexNumber(2, 32, "tHdrat");
 NexText tHdratStat = NexText(2, 17, "tHdratStat");
 NexButton bUkurHD = NexButton(2, 22, "bUkurHD");
 
 //JmlDaun
-NexNumber tJmlDaun = NexNumber(2, 34, "tJmlDaun");
+NexNumber tJmlDaun = NexNumber(2, 33, "tJmlDaun");
 NexText tJmlDaunStat = NexText(2, 18, "tJmlDaunStat");
 NexButton addDaun = NexButton(2, 28, "addDaun");
 NexButton minDaun = NexButton(2, 29, "minDaun");
 
 //KelTanah
-NexNumber tKelTanah = NexNumber(2, 36, "tKelTanah");
+NexNumber tKelTanah = NexNumber(2, 35, "tKelTanah");
 NexText tKelTanahStat = NexText(2, 25, "tKelTanahStat");
 NexButton bUkurKelTanah = NexButton(2, 26, "bUkurKelTanah");
 
 //Simpan data
 NexButton bSimpan = NexButton(2, 23, "bSimpan");
-NexButton Analisa = NexButton(2, 37, "Analisa");
+NexButton Analisa = NexButton(2, 36, "Analisa");
 NexText tLulus = NexText(2, 13, "tLulus");
 //End OF Acra seedling
 
@@ -57,31 +57,31 @@ NexText tDimStat2 = NexText(3, 15, "tDimStat");
 NexButton bUkurDim2 = NexButton(3, 20, "bUkurDim");
 
 //Panjang internode
-NexNumber tPjg2 = NexNumber(3, 32, "tPjg");
-NexNumber tPjgTing2 = NexNumber(3, 36, "tPjgTing");
+NexNumber tPjg2 = NexNumber(3, 31, "tPjg");
+NexNumber tPjgTing2 = NexNumber(3, 34, "tPjgTing");
 NexText tPjgStat2 = NexText(3, 16, "tPjgStat");
 NexButton addPjg2 = NexButton(3, 21, "addPjg");
 NexButton minPjg2 = NexButton(3, 27, "minPjg");
 
 //HDRatio
-NexNumber tHdrat2 = NexNumber(3, 33, "tHdrat");
+NexNumber tHdrat2 = NexNumber(3, 32, "tHdrat");
 NexText tHdratStat2 = NexText(3, 17, "tHdratStat");
 NexButton bUkurHD2 = NexButton(3, 22, "bUkurHD");
 
 //JmlDaun
-NexNumber tJmlDaun2 = NexNumber(3, 34, "tJmlDaun");
+NexNumber tJmlDaun2 = NexNumber(3, 33, "tJmlDaun");
 NexText tJmlDaunStat2 = NexText(3, 18, "tJmlDaunStat");
 NexButton addDaun2 = NexButton(3, 28, "addDaun");
 NexButton minDaun2 = NexButton(3, 29, "minDaun");
 
 //KelTanah
-NexNumber tKelTanah2 = NexNumber(3, 36, "tKelTanah");
+NexNumber tKelTanah2 = NexNumber(3, 35, "tKelTanah");
 NexText tKelTanahStat2 = NexText(3, 25, "tKelTanahStat");
 NexButton bUkurKelTanah2 = NexButton(3, 26, "bUkurKelTanah");
 
 //Simpan data
 NexButton bSimpan2 = NexButton(3, 23, "bSimpan");
-NexButton Analisa2 = NexButton(3, 37, "Analisa");
+NexButton Analisa2 = NexButton(3, 36, "Analisa");
 NexText tLulus2 = NexText(3, 13, "tLulus");
 //End OF Acra Cutting
 
@@ -97,31 +97,31 @@ NexText tDimStat3 = NexText(4, 15, "tDimStat");
 NexButton bUkurDim3 = NexButton(4, 20, "bUkurDim");
 
 //Panjang internode
-NexNumber tPjg3 = NexNumber(4, 32, "tPjg");
-NexNumber tPjgTing3 = NexNumber(4, 36, "tPjgTing");
+NexNumber tPjg3 = NexNumber(4, 31, "tPjg");
+NexNumber tPjgTing3 = NexNumber(4, 34, "tPjgTing");
 NexText tPjgStat3 = NexText(4, 16, "tPjgStat");
 NexButton addPjg3 = NexButton(4, 21, "addPjg");
 NexButton minPjg3 = NexButton(4, 27, "minPjg");
 
 //HDRatio
-NexNumber tHdrat3 = NexNumber(4, 33, "tHdrat");
+NexNumber tHdrat3 = NexNumber(4, 32, "tHdrat");
 NexText tHdratStat3 = NexText(4, 17, "tHdratStat");
 NexButton bUkurHD3 = NexButton(4, 22, "bUkurHD");
 
 //JmlDaun
-NexNumber tJmlDaun3 = NexNumber(4, 34, "tJmlDaun");
+NexNumber tJmlDaun3 = NexNumber(4, 33, "tJmlDaun");
 NexText tJmlDaunStat3 = NexText(4, 18, "tJmlDaunStat");
 NexButton addDaun3 = NexButton(4, 28, "addDaun");
 NexButton minDaun3 = NexButton(4, 29, "minDaun");
 
 //KelTanah
-NexNumber tKelTanah3 = NexNumber(4, 36, "tKelTanah");
+NexNumber tKelTanah3 = NexNumber(4, 35, "tKelTanah");
 NexText tKelTanahStat3 = NexText(4, 25, "tKelTanahStat");
 NexButton bUkurKelTanah3 = NexButton(4, 26, "bUkurKelTanah");
 
 //Simpan data
 NexButton bSimpan3 = NexButton(4, 23, "bSimpan");
-NexButton Analisa3 = NexButton(4, 37, "Analisa");
+NexButton Analisa3 = NexButton(4, 36, "Analisa");
 NexText tLulus3 = NexText(4, 13, "tLulus");
 //End OF EP0077A PT
 
@@ -695,7 +695,7 @@ void bAnalisaCB3(void *ptr) {
   uint32_t daun = 0;
 
   tTinggi3.getValue(&tinggi);
-  if (nilai >= 25 && nilai <= 45) {
+  if (tinggi >= 25 && tinggi <= 45) {
     L += 1;
   } else {
     TL += 1;
