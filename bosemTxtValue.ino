@@ -545,13 +545,12 @@ void setup()
 void loop(void)
 {
   nexLoop(nex_listen_list);
-  Serial.println(sensor.readRangeContinuousMillimeters());
 }
 
 //Acra Seddling
 //ukur tinggi
 void bUkurTinggiCB(void *ptr) {
-  float nilai = sensor.readRangeContinuousMillimeters() / 10;
+  float nilai = (float)sensor.readRangeContinuousMillimeters() / 10;
   if (nilai >= 30) {
     tTingStat.setText("L");
   } else {
@@ -742,7 +741,7 @@ void bSimpanCB(void *ptr) {
 //Acra Cutting
 //ukur tinggi
 void bUkurTinggiCB2(void *ptr) {
-  float nilai = sensor.readRangeContinuousMillimeters() / 10;
+  float nilai = (float)sensor.readRangeContinuousMillimeters() / 10;
   if (nilai >= 30) {
     tTingStat2.setText("L");
   } else {
@@ -933,7 +932,7 @@ void bSimpanCB2(void *ptr) {
 //EP0077A PT
 //ukur tinggi
 void bUkurTinggiCB3(void *ptr) {
-  float nilai = sensor.readRangeContinuousMillimeters() / 10;
+  float nilai = (float)sensor.readRangeContinuousMillimeters() / 10;
   if (nilai >= 25 && nilai <= 45) {
     tTingStat3.setText("L");
   } else {
@@ -1124,7 +1123,7 @@ void bSimpanCB3(void *ptr) {
 //EP0361WK PT
 //ukur tinggi
 void bUkurTinggiCB4(void *ptr) {
-  float nilai = sensor.readRangeContinuousMillimeters() / 10;
+  float nilai = (float)sensor.readRangeContinuousMillimeters() / 10;
   if (nilai >= 30 && nilai <= 50) {
     tTingStat4.setText("L");
   } else {
@@ -1315,7 +1314,7 @@ void bSimpanCB4(void *ptr) {
 //CLONE PT
 //ukur tinggi
 void bUkurTinggiCB5(void *ptr) {
-  float nilai = sensor.readRangeContinuousMillimeters() / 10;
+  float nilai = (float)sensor.readRangeContinuousMillimeters() / 10;
   if (nilai >= 25 && nilai <= 50) {
     tTingStat5.setText("L");
   } else {
@@ -1506,7 +1505,7 @@ void bSimpanCB5(void *ptr) {
 //EP0077AA PP
 //ukur tinggi
 void bUkurTinggiCB6(void *ptr) {
-  float nilai = sensor.readRangeContinuousMillimeters() / 10;
+  float nilai = (float)sensor.readRangeContinuousMillimeters() / 10;
   if (nilai >= 30 && nilai <= 50) {
     tTingStat6.setText("L");
   } else {
@@ -1698,7 +1697,7 @@ void bSimpanCB6(void *ptr) {
 //EP0361WK PP
 //ukur tinggi
 void bUkurTinggiCB7(void *ptr) {
-  float nilai = sensor.readRangeContinuousMillimeters() / 10;
+  float nilai = (float)sensor.readRangeContinuousMillimeters() / 10;
   if (nilai >= 35 && nilai <= 55) {
     tTingStat7.setText("L");
   } else {
@@ -1890,7 +1889,7 @@ void bSimpanCB7(void *ptr) {
 //CLONE PP
 //ukur tinggi
 void bUkurTinggiCB8(void *ptr) {
-  float nilai = sensor.readRangeContinuousMillimeters() / 10;
+  float nilai = (float)sensor.readRangeContinuousMillimeters() / 10;
   if (nilai >= 30 && nilai <= 55) {
     tTingStat8.setText("L");
   } else {
