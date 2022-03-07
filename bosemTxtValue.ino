@@ -1,8 +1,6 @@
 #include <Nextion.h>
 #include <Wire.h>
 #include <VL53L0X.h>
-#include<stdio.h>
-
 VL53L0X sensor;
 const int SoilSensor = A0;
 
@@ -13,6 +11,8 @@ uint16_t LentxtSensorSV = sizeof(txtSensorSV);
 //statics
 char txSensorSV[10] = {'0'};
 char result[10] = {0};
+
+float batasBawah = 50;
 
 //Acra seedling
 //Tinggi
@@ -563,27 +563,27 @@ void bUkurTinggiCB(void *ptr) {
 
 //ukur diameter
 void bUkurDimCB(void *ptr) {
-  float nilai = sensor.readRangeContinuousMillimeters();
-  nilai = nilai - 30;
+  float nilai = (float)sensor.readRangeContinuousMillimeters() - batasBawah;
+
   if (nilai >= 3) {
     tDimStat.setText("L");
   } else {
     tDimStat.setText("TL");
   }
   char dim[10];
-  utoa(nilai, dim, 10);
+    dtostrf(nilai, 10, 2, dim);
   tDim.setText(dim);
 }
 
 //ukur pjg internode
 void bAddPjgCB(void *ptr) {
-//  memset(txtSensorSV, 0, sizeof txtSensorSV);   tTinggi.getText(txSensorSV, LentxtSensorSV);
-  float tinggi = 0;
-  memset(txtSensorSV, 0, sizeof txtSensorSV);   tPjg.getText(txSensorSV, LentxtSensorSV);
+  memset(txtSensorSV, 0, sizeof txtSensorSV);   tTinggi.getText(txtSensorSV, LentxtSensorSV);
+  float tinggi = atoi(txtSensorSV);
+  memset(txtSensorSV, 0, sizeof txtSensorSV);   tPjg.getText(txtSensorSV, LentxtSensorSV);
   int pjgIn = atoi(txtSensorSV);
 
   pjgIn += 1;
-  itoa(result, pjgIn, 10);
+  dtostrf(pjgIn, 10, 0, result);
   tPjg.setText(result);
 
   float nilaiIn = tinggi / pjgIn;
@@ -597,13 +597,13 @@ void bAddPjgCB(void *ptr) {
 }
 
 void bMinPjgCB(void *ptr) {
-  memset(txtSensorSV, 0, sizeof txtSensorSV);   tTinggi.getText(txSensorSV, LentxtSensorSV);
+  memset(txtSensorSV, 0, sizeof txtSensorSV);   tTinggi.getText(txtSensorSV, LentxtSensorSV);
   float tinggi = atof(txtSensorSV);
-  memset(txtSensorSV, 0, sizeof txtSensorSV);   tPjg.getText(txSensorSV, LentxtSensorSV);
+  memset(txtSensorSV, 0, sizeof txtSensorSV);   tPjg.getText(txtSensorSV, LentxtSensorSV);
   int pjgIn = atoi(txtSensorSV);
 
   pjgIn -= 1;
-  itoa(result, pjgIn, 10);
+  dtostrf(pjgIn, 10, 0, result);
   tPjg.setText(result);
 
   float nilaiIn = tinggi / pjgIn;
@@ -618,9 +618,9 @@ void bMinPjgCB(void *ptr) {
 
 //ukur HD Rat
 void bUkurHDCB(void *ptr) {
-  memset(txtSensorSV, 0, sizeof txtSensorSV);   tTinggi.getText(txSensorSV, LentxtSensorSV);
+  memset(txtSensorSV, 0, sizeof txtSensorSV);   tTinggi.getText(txtSensorSV, LentxtSensorSV);
   float nilaiH = atof(txtSensorSV);
-  memset(txtSensorSV, 0, sizeof txtSensorSV);   tDim.getText(txSensorSV, LentxtSensorSV);
+  memset(txtSensorSV, 0, sizeof txtSensorSV);   tDim.getText(txtSensorSV, LentxtSensorSV);
   float nilaiDim = atof(txtSensorSV);
   float nilaiHD = (nilaiH * 10) / nilaiDim;
 
@@ -635,10 +635,11 @@ void bUkurHDCB(void *ptr) {
 
 //ukur jml daun
 void bAddDaunCB(void *ptr) {
-  memset(txtSensorSV, 0, sizeof txtSensorSV);   tJmlDaun.getText(txtSensorSV, LentxtSensorSV);
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tJmlDaun.getText(txtSensorSV, LentxtSensorSV);
   int daun = atoi(txtSensorSV);
   daun += 1;
-  itoa(result, daun, 10);
+  dtostrf(daun, 10, 0, result);
   tJmlDaun.setText(result);
   if (daun >= 4) {
     tJmlDaunStat.setText("L");
@@ -651,7 +652,7 @@ void bMinDaunCB(void *ptr) {
   memset(txtSensorSV, 0, sizeof txtSensorSV);   tJmlDaun.getText(txtSensorSV, LentxtSensorSV);
   int daun = atoi(txtSensorSV);
   daun -= 1;
-  itoa(result, daun, 10);
+  dtostrf(daun, 10, 0, result);
   tJmlDaun.setText(result);
   if (daun >= 4) {
     tJmlDaunStat.setText("L");
@@ -754,15 +755,15 @@ void bUkurTinggiCB2(void *ptr) {
 
 //ukur diameter
 void bUkurDimCB2(void *ptr) {
-  float nilai = sensor.readRangeContinuousMillimeters();
-  nilai = nilai - 30;
+  float nilai = (float)sensor.readRangeContinuousMillimeters() - batasBawah;
+
   if (nilai >= 3) {
     tDimStat2.setText("L");
   } else {
     tDimStat2.setText("TL");
   }
   char dim[10];
-  utoa(nilai, dim, 10);
+    dtostrf(nilai, 10, 2, dim);
   tDim2.setText(dim);
 }
 
@@ -773,8 +774,8 @@ void bAddPjgCB2(void *ptr) {
   memset(txtSensorSV, 0, sizeof txtSensorSV);   tPjg2.getText(txtSensorSV, LentxtSensorSV);
   int pjgIn = atoi(txtSensorSV);
 
-              pjgIn += 1;
-  itoa(result, pjgIn, 10);
+  pjgIn += 1;
+  dtostrf(pjgIn, 10, 0, result);
   tPjg2.setText(result);
 
   float nilaiIn = tinggi / pjgIn;
@@ -794,7 +795,7 @@ void bMinPjgCB2(void *ptr) {
   int pjgIn = atoi(txtSensorSV);
 
   pjgIn -= 1;
-  itoa(result, pjgIn, 10);
+  dtostrf(pjgIn, 10, 0, result);
   tPjg2.setText(result);
 
   float nilaiIn = tinggi / pjgIn;
@@ -820,7 +821,7 @@ void bUkurHDCB2(void *ptr) {
   } else {
     tHdratStat2.setText("TL");
   }
-  dtostrf(nilaiHD,10,2,result);
+  dtostrf(nilaiHD, 10, 2, result);
   tHdrat2.setText(result);
 }
 
@@ -829,7 +830,7 @@ void bAddDaunCB2(void *ptr) {
   memset(txtSensorSV, 0, sizeof txtSensorSV);   tJmlDaun2.getText(txtSensorSV, LentxtSensorSV);
   int daun = atoi(txtSensorSV);
   daun += 1;
-  itoa(result, daun, 10);
+  dtostrf(daun, 10, 0, result);
   tJmlDaun2.setText(result);
   if (daun >= 5) {
     tJmlDaunStat2.setText("L");
@@ -842,7 +843,7 @@ void bMinDaunCB2(void *ptr) {
   memset(txtSensorSV, 0, sizeof txtSensorSV);   tJmlDaun2.getText(txtSensorSV, LentxtSensorSV);
   int daun = atoi(txtSensorSV);
   daun -= 1;
-  itoa(result, daun, 10);
+  dtostrf(daun, 10, 0, result);
   tJmlDaun2.setText(result);
   if (daun >= 5) {
     tJmlDaunStat2.setText("L");
@@ -945,15 +946,15 @@ void bUkurTinggiCB3(void *ptr) {
 
 //ukur diameter
 void bUkurDimCB3(void *ptr) {
-  float nilai = sensor.readRangeContinuousMillimeters();
-  nilai = nilai - 30;
+  float nilai = (float)sensor.readRangeContinuousMillimeters() - batasBawah;
+
   if (nilai >= 2.2) {
     tDimStat3.setText("L");
   } else {
     tDimStat3.setText("TL");
   }
   char dim[10];
-  utoa(nilai, dim, 10);
+    dtostrf(nilai, 10, 2, dim);
   tDim3.setText(dim);
 }
 
@@ -965,7 +966,7 @@ void bAddPjgCB3(void *ptr) {
   int pjgIn = atoi(txtSensorSV);
 
   pjgIn += 1;
-  itoa(result, pjgIn, 10);
+  dtostrf(pjgIn, 10, 0, result);
   tPjg3.setText(result);
 
   float nilaiIn = tinggi / pjgIn;
@@ -985,7 +986,7 @@ void bMinPjgCB3(void *ptr) {
   int pjgIn = atoi(txtSensorSV);
 
   pjgIn -= 1;
-  itoa(result, pjgIn, 10);
+  dtostrf(pjgIn, 10, 0, result);
   tPjg3.setText(result);
 
   float nilaiIn = tinggi / pjgIn;
@@ -1020,7 +1021,7 @@ void bAddDaunCB3(void *ptr) {
   memset(txtSensorSV, 0, sizeof txtSensorSV);   tJmlDaun3.getText(txtSensorSV, LentxtSensorSV);
   int daun = atoi(txtSensorSV);
   daun += 1;
-  itoa(result, daun, 10);
+  dtostrf(daun, 10, 0, result);
   tJmlDaun3.setText(result);
   if (daun >= 5) {
     tJmlDaunStat3.setText("L");
@@ -1033,7 +1034,7 @@ void bMinDaunCB3(void *ptr) {
   memset(txtSensorSV, 0, sizeof txtSensorSV);   tJmlDaun3.getText(txtSensorSV, LentxtSensorSV);
   int daun = atoi(txtSensorSV);
   daun -= 1;
-  itoa(result, daun, 10);
+  dtostrf(daun, 10, 0, result);
   tJmlDaun3.setText(result);
   if (daun >= 5) {
     tJmlDaunStat3.setText("L");
@@ -1136,15 +1137,15 @@ void bUkurTinggiCB4(void *ptr) {
 
 //ukur diameter
 void bUkurDimCB4(void *ptr) {
-  float nilai = sensor.readRangeContinuousMillimeters();
-  nilai = nilai - 30;
+  float nilai = (float)sensor.readRangeContinuousMillimeters() - batasBawah;
+
   if (nilai >= 2.7) {
     tDimStat4.setText("L");
   } else {
     tDimStat4.setText("TL");
   }
   char dim[10];
-  utoa(nilai, dim, 10);
+    dtostrf(nilai, 10, 2, dim);
   tDim4.setText(dim);
 }
 
@@ -1156,7 +1157,7 @@ void bAddPjgCB4(void *ptr) {
   int pjgIn = atoi(txtSensorSV);
 
   pjgIn += 1;
-  itoa(result, pjgIn, 10);
+  dtostrf(pjgIn, 10, 0, result);
   tPjg4.setText(result);
 
   float nilaiIn = tinggi / pjgIn;
@@ -1176,7 +1177,7 @@ void bMinPjgCB4(void *ptr) {
   int pjgIn = atoi(txtSensorSV);
 
   pjgIn -= 1;
-  itoa(result, pjgIn, 10);
+  dtostrf(pjgIn, 10, 0, result);
   tPjg4.setText(result);
 
   float nilaiIn = tinggi / pjgIn;
@@ -1211,7 +1212,7 @@ void bAddDaunCB4(void *ptr) {
   memset(txtSensorSV, 0, sizeof txtSensorSV);   tJmlDaun4.getText(txtSensorSV, LentxtSensorSV);
   int daun = atoi(txtSensorSV);
   daun += 1;
-  itoa(result, daun, 10);
+  dtostrf(daun, 10, 0, result);
   tJmlDaun4.setText(result);
   if (daun >= 5) {
     tJmlDaunStat4.setText("L");
@@ -1224,7 +1225,7 @@ void bMinDaunCB4(void *ptr) {
   memset(txtSensorSV, 0, sizeof txtSensorSV);   tJmlDaun4.getText(txtSensorSV, LentxtSensorSV);
   int daun = atoi(txtSensorSV);
   daun -= 1;
-  itoa(result, daun, 10);
+  dtostrf(daun, 10, 0, result);
   tJmlDaun4.setText(result);
   if (daun >= 5) {
     tJmlDaunStat4.setText("L");
@@ -1327,15 +1328,15 @@ void bUkurTinggiCB5(void *ptr) {
 
 //ukur diameter
 void bUkurDimCB5(void *ptr) {
-  float nilai = sensor.readRangeContinuousMillimeters();
-  nilai = nilai - 30;
+  float nilai = (float)sensor.readRangeContinuousMillimeters() - batasBawah;
+
   if (nilai >= 2.2) {
     tDimStat5.setText("L");
   } else {
     tDimStat5.setText("TL");
   }
   char dim[10];
-  utoa(nilai, dim, 10);
+    dtostrf(nilai, 10, 2, dim);
   tDim5.setText(dim);
 }
 
@@ -1347,7 +1348,7 @@ void bAddPjgCB5(void *ptr) {
   int pjgIn = atoi(txtSensorSV);
 
   pjgIn += 1;
-  itoa(result, pjgIn, 10);
+  dtostrf(pjgIn, 10, 0, result);
   tPjg5.setText(result);
 
   float nilaiIn = tinggi / pjgIn;
@@ -1367,7 +1368,7 @@ void bMinPjgCB5(void *ptr) {
   int pjgIn = atoi(txtSensorSV);
 
   pjgIn -= 1;
-  itoa(result, pjgIn, 10);
+  dtostrf(pjgIn, 10, 0, result);
   tPjg5.setText(result);
 
   float nilaiIn = tinggi / pjgIn;
@@ -1402,7 +1403,7 @@ void bAddDaunCB5(void *ptr) {
   memset(txtSensorSV, 0, sizeof txtSensorSV);   tJmlDaun5.getText(txtSensorSV, LentxtSensorSV);
   int daun = atoi(txtSensorSV);
   daun += 1;
-  itoa(result, daun, 10);
+  dtostrf(daun, 10, 0, result);
   tJmlDaun5.setText(result);
   if (daun >= 5) {
     tJmlDaunStat5.setText("L");
@@ -1415,7 +1416,7 @@ void bMinDaunCB5(void *ptr) {
   memset(txtSensorSV, 0, sizeof txtSensorSV);   tJmlDaun5.getText(txtSensorSV, LentxtSensorSV);
   int daun = atoi(txtSensorSV);
   daun += 1;
-  itoa(result, daun, 10);
+  dtostrf(daun, 10, 0, result);
   tJmlDaun5.setText(result);
   if (daun >= 5) {
     tJmlDaunStat5.setText("L");
@@ -1518,15 +1519,15 @@ void bUkurTinggiCB6(void *ptr) {
 
 //ukur diameter
 void bUkurDimCB6(void *ptr) {
-  float nilai = sensor.readRangeContinuousMillimeters();
-  nilai = nilai - 30;
+  float nilai = (float)sensor.readRangeContinuousMillimeters() - batasBawah;
+
   if (nilai >= 2.3) {
     tDimStat6.setText("L");
   } else {
     tDimStat6.setText("TL");
   }
   char dim[10];
-  utoa(nilai, dim, 10);
+    dtostrf(nilai, 10, 2, dim);
   tDim6.setText(dim);
 }
 
@@ -1538,7 +1539,7 @@ void bAddPjgCB6(void *ptr) {
   int pjgIn = atoi(txtSensorSV);
 
   pjgIn += 1;
-  itoa(result, pjgIn, 10);
+  dtostrf(pjgIn, 10, 0, result);
   tPjg6.setText(result);
 
   float nilaiIn = tinggi / pjgIn;
@@ -1558,7 +1559,7 @@ void bMinPjgCB6(void *ptr) {
   int pjgIn = atoi(txtSensorSV);
 
   pjgIn -= 1;
-  itoa(result, pjgIn, 10);
+  dtostrf(pjgIn, 10, 0, result);
   tPjg6.setText(result);
 
   float nilaiIn = tinggi / pjgIn;
@@ -1594,7 +1595,7 @@ void bAddDaunCB6(void *ptr) {
   memset(txtSensorSV, 0, sizeof txtSensorSV);   tJmlDaun6.getText(txtSensorSV, LentxtSensorSV);
   int daun = atoi(txtSensorSV);
   daun += 1;
-  itoa(result, daun, 10);
+  dtostrf(daun, 10, 0, result);
   tJmlDaun6.setText(result);
   if (daun >= 5) {
     tJmlDaunStat6.setText("L");
@@ -1607,7 +1608,7 @@ void bMinDaunCB6(void *ptr) {
   memset(txtSensorSV, 0, sizeof txtSensorSV);   tJmlDaun6.getText(txtSensorSV, LentxtSensorSV);
   int daun = atoi(txtSensorSV);
   daun -= 1;
-  itoa(result, daun, 10);
+  dtostrf(daun, 10, 0, result);
   tJmlDaun6.setText(result);
   if (daun >= 5) {
     tJmlDaunStat6.setText("L");
@@ -1710,15 +1711,15 @@ void bUkurTinggiCB7(void *ptr) {
 
 //ukur diameter
 void bUkurDimCB7(void *ptr) {
-  float nilai = sensor.readRangeContinuousMillimeters();
-  nilai = nilai - 30;
+  float nilai = (float)sensor.readRangeContinuousMillimeters() - batasBawah;
+
   if (nilai >= 3) {
     tDimStat7.setText("L");
   } else {
     tDimStat7.setText("TL");
   }
   char dim[10];
-  utoa(nilai, dim, 10);
+    dtostrf(nilai, 10, 2, dim);
   tDim7.setText(dim);
 }
 
@@ -1730,7 +1731,7 @@ void bAddPjgCB7(void *ptr) {
   int pjgIn = atoi(txtSensorSV);
 
   pjgIn += 1;
-  itoa(result, pjgIn, 10);
+  dtostrf(pjgIn, 10, 0, result);
   tPjg7.setText(result);
 
   float nilaiIn = tinggi / pjgIn;
@@ -1751,7 +1752,7 @@ void bMinPjgCB7(void *ptr) {
   int pjgIn = atoi(txtSensorSV);
 
   pjgIn -= 1;
-  itoa(result, pjgIn, 10);
+  dtostrf(pjgIn, 10, 0, result);
   tPjg7.setText(result);
 
   float nilaiIn = tinggi / pjgIn;
@@ -1786,7 +1787,7 @@ void bAddDaunCB7(void *ptr) {
   memset(txtSensorSV, 0, sizeof txtSensorSV);   tJmlDaun7.getText(txtSensorSV, LentxtSensorSV);
   int daun = atoi(txtSensorSV);
   daun += 1;
-  itoa(result, daun, 10);
+  dtostrf(daun, 10, 0, result);
   tJmlDaun7.setText(result);
   if (daun >= 5) {
     tJmlDaunStat7.setText("L");
@@ -1799,7 +1800,7 @@ void bMinDaunCB7(void *ptr) {
   memset(txtSensorSV, 0, sizeof txtSensorSV);   tJmlDaun7.getText(txtSensorSV, LentxtSensorSV);
   int daun = atoi(txtSensorSV);
   daun -= 1;
-  itoa(result, daun, 10);
+  dtostrf(daun, 10, 0, result);
   tJmlDaun7.setText(result);
   if (daun >= 5) {
     tJmlDaunStat7.setText("L");
@@ -1902,15 +1903,15 @@ void bUkurTinggiCB8(void *ptr) {
 
 //ukur diameter
 void bUkurDimCB8(void *ptr) {
-  float nilai = sensor.readRangeContinuousMillimeters();
-  nilai = nilai - 30;
+  float nilai = (float)sensor.readRangeContinuousMillimeters() - batasBawah;
+
   if (nilai >= 2.3) {
     tDimStat8.setText("L");
   } else {
     tDimStat8.setText("TL");
   }
   char dim[10];
-  utoa(nilai, dim, 10);
+    dtostrf(nilai, 10, 2, dim);
   tDim8.setText(dim);
 }
 
@@ -1922,7 +1923,7 @@ void bAddPjgCB8(void *ptr) {
   int pjgIn = atoi(txtSensorSV);
 
   pjgIn += 1;
-  itoa(result, pjgIn, 10);
+  dtostrf(pjgIn, 10, 0, result);
   tPjg8.setText(result);
 
   float nilaiIn = tinggi / pjgIn;
@@ -1942,7 +1943,7 @@ void bMinPjgCB8(void *ptr) {
   int pjgIn = atoi(txtSensorSV);
 
   pjgIn -= 1;
-  itoa(result, pjgIn, 10);
+  dtostrf(pjgIn, 10, 0, result);
   tPjg8.setText(result);
 
   float nilaiIn = tinggi / pjgIn;
@@ -1975,10 +1976,11 @@ void bUkurHDCB8(void *ptr) {
 
 //ukur jml daun
 void bAddDaunCB8(void *ptr) {
-  memset(txtSensorSV, 0, sizeof txtSensorSV);   tJmlDaun8.getText(txtSensorSV, LentxtSensorSV);
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tJmlDaun8.getText(txtSensorSV, LentxtSensorSV);
   int daun = atoi(txtSensorSV);
   daun += 1;
-  itoa(result, daun, 10);
+  dtostrf(daun, 10, 0, result);
   tJmlDaun8.setText(result);
   if (daun >= 5) {
     tJmlDaunStat8.setText("L");
@@ -1991,7 +1993,7 @@ void bMinDaunCB8(void *ptr) {
   memset(txtSensorSV, 0, sizeof txtSensorSV);   tJmlDaun8.getText(txtSensorSV, LentxtSensorSV);
   int daun = atoi(txtSensorSV);
   daun -= 1;
-  itoa(result, daun, 10);
+  dtostrf(daun, 10, 0, result);
   tJmlDaun8.setText(result);
   if (daun >= 5) {
     tJmlDaunStat8.setText("L");
