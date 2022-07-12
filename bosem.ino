@@ -1,329 +1,364 @@
 #include <Nextion.h>
 #include <Wire.h>
 #include <VL53L0X.h>
-
 VL53L0X sensor;
 const int SoilSensor = A0;
 
+//buffers
+char txtSensorSV[10] = {'0'};
+uint16_t LentxtSensorSV = sizeof(txtSensorSV);
+int bit_array[25];        // For storing the data bit. bit_array[0] = data bit 1 (LSB), bit_array[23] = data bit 24 (MSB).
+unsigned long time_now;
+//statics
+char txSensorSV[10] = {'0'};
+char result[10] = {0};
+
+float batasBawah = 50;
+// Pin Declarations
+int DATA_PIN = 4;
+int CLOCK_PIN = 5;
+// Variables
+int clock = 1;
+int lastClock = 1;
+unsigned long time = 0;
+unsigned long timeStart = 0;
+int out = 0;
+
 //Acra seedling
 //Tinggi
-NexNumber tTinggi = NexNumber(2, 30, "tTinggi");
+NexText tTinggi = NexText(2, 31, "tTinggi");
 NexText tTingStat = NexText(2, 14, "tTingStat");
 NexButton bUkurTinggi = NexButton(2, 19, "bUkurTinggi");
 
 //Diameter
-NexNumber tDim = NexNumber(2, 37, "tDim");
+NexText tDim = NexText(2, 32, "tDim");
 NexText tDimStat = NexText(2, 15, "tDimStat");
 NexButton bUkurDim = NexButton(2, 20, "bUkurDim");
 
 //Panjang internode
-NexNumber tPjg = NexNumber(2, 31, "tPjg");
-NexNumber tPjgTing = NexNumber(2, 34, "tPjgTing");
+NexText tPjg = NexText(2, 34, "tPjg");
+NexText tPjgTing = NexText(2, 33, "tPjgTing");
 NexText tPjgStat = NexText(2, 16, "tPjgStat");
 NexButton addPjg = NexButton(2, 21, "addPjg");
 NexButton minPjg = NexButton(2, 27, "minPjg");
 
 //HDRatio
-NexNumber tHdrat = NexNumber(2, 32, "tHdrat");
+NexText tHdrat = NexText(2, 35, "tHdrat");
 NexText tHdratStat = NexText(2, 17, "tHdratStat");
 NexButton bUkurHD = NexButton(2, 22, "bUkurHD");
 
 //JmlDaun
-NexNumber tJmlDaun = NexNumber(2, 33, "tJmlDaun");
+NexText tJmlDaun = NexText(2, 36, "tJmlDaun");
 NexText tJmlDaunStat = NexText(2, 18, "tJmlDaunStat");
 NexButton addDaun = NexButton(2, 28, "addDaun");
 NexButton minDaun = NexButton(2, 29, "minDaun");
 
 //KelTanah
-NexNumber tKelTanah = NexNumber(2, 35, "tKelTanah");
+NexText tKelTanah = NexText(2, 37, "tKelTanah");
 NexText tKelTanahStat = NexText(2, 25, "tKelTanahStat");
 NexButton bUkurKelTanah = NexButton(2, 26, "bUkurKelTanah");
 
 //Simpan data
 NexButton bSimpan = NexButton(2, 23, "bSimpan");
-NexButton Analisa = NexButton(2, 36, "Analisa");
+NexButton Analisa = NexButton(2, 30, "Analisa");
 NexText tLulus = NexText(2, 13, "tLulus");
 //End OF Acra seedling
 
 //Acra Cutting
 //Tinggi
-NexNumber tTinggi2 = NexNumber(3, 30, "tTinggi");
+NexText tTinggi2 = NexText(3, 31, "tTinggi");
 NexText tTingStat2 = NexText(3, 14, "tTingStat");
 NexButton bUkurTinggi2 = NexButton(3, 19, "bUkurTinggi");
 
 //Diameter
-NexNumber tDim2 = NexNumber(3, 37, "tDim");
+NexText tDim2 = NexText(3, 32, "tDim");
 NexText tDimStat2 = NexText(3, 15, "tDimStat");
 NexButton bUkurDim2 = NexButton(3, 20, "bUkurDim");
 
 //Panjang internode
-NexNumber tPjg2 = NexNumber(3, 31, "tPjg");
-NexNumber tPjgTing2 = NexNumber(3, 34, "tPjgTing");
+NexText tPjg2 = NexText(3, 34, "tPjg");
+NexText tPjgTing2 = NexText(3, 33, "tPjgTing");
 NexText tPjgStat2 = NexText(3, 16, "tPjgStat");
 NexButton addPjg2 = NexButton(3, 21, "addPjg");
 NexButton minPjg2 = NexButton(3, 27, "minPjg");
 
 //HDRatio
-NexNumber tHdrat2 = NexNumber(3, 32, "tHdrat");
+NexText tHdrat2 = NexText(3, 35, "tHdrat");
 NexText tHdratStat2 = NexText(3, 17, "tHdratStat");
 NexButton bUkurHD2 = NexButton(3, 22, "bUkurHD");
 
 //JmlDaun
-NexNumber tJmlDaun2 = NexNumber(3, 33, "tJmlDaun");
+NexText tJmlDaun2 = NexText(3, 36, "tJmlDaun");
 NexText tJmlDaunStat2 = NexText(3, 18, "tJmlDaunStat");
 NexButton addDaun2 = NexButton(3, 28, "addDaun");
 NexButton minDaun2 = NexButton(3, 29, "minDaun");
 
 //KelTanah
-NexNumber tKelTanah2 = NexNumber(3, 35, "tKelTanah");
+NexText tKelTanah2 = NexText(3, 37, "tKelTanah");
 NexText tKelTanahStat2 = NexText(3, 25, "tKelTanahStat");
 NexButton bUkurKelTanah2 = NexButton(3, 26, "bUkurKelTanah");
 
 //Simpan data
 NexButton bSimpan2 = NexButton(3, 23, "bSimpan");
-NexButton Analisa2 = NexButton(3, 36, "Analisa");
+NexButton Analisa2 = NexButton(3, 30, "Analisa");
 NexText tLulus2 = NexText(3, 13, "tLulus");
 //End OF Acra Cutting
 
 //EP0077A PT
 //Tinggi
-NexNumber tTinggi3 = NexNumber(4, 30, "tTinggi");
+NexText tTinggi3 = NexText(4, 31, "tTinggi");
 NexText tTingStat3 = NexText(4, 14, "tTingStat");
 NexButton bUkurTinggi3 = NexButton(4, 19, "bUkurTinggi");
 
 //Diameter
-NexNumber tDim3 = NexNumber(4, 37, "tDim");
+NexText tDim3 = NexText(4, 32, "tDim");
 NexText tDimStat3 = NexText(4, 15, "tDimStat");
 NexButton bUkurDim3 = NexButton(4, 20, "bUkurDim");
 
 //Panjang internode
-NexNumber tPjg3 = NexNumber(4, 31, "tPjg");
-NexNumber tPjgTing3 = NexNumber(4, 34, "tPjgTing");
+NexText tPjg3 = NexText(4, 34, "tPjg");
+NexText tPjgTing3 = NexText(4, 33, "tPjgTing");
 NexText tPjgStat3 = NexText(4, 16, "tPjgStat");
 NexButton addPjg3 = NexButton(4, 21, "addPjg");
 NexButton minPjg3 = NexButton(4, 27, "minPjg");
 
 //HDRatio
-NexNumber tHdrat3 = NexNumber(4, 32, "tHdrat");
+NexText tHdrat3 = NexText(4, 35, "tHdrat");
 NexText tHdratStat3 = NexText(4, 17, "tHdratStat");
 NexButton bUkurHD3 = NexButton(4, 22, "bUkurHD");
 
 //JmlDaun
-NexNumber tJmlDaun3 = NexNumber(4, 33, "tJmlDaun");
+NexText tJmlDaun3 = NexText(4, 36, "tJmlDaun");
 NexText tJmlDaunStat3 = NexText(4, 18, "tJmlDaunStat");
 NexButton addDaun3 = NexButton(4, 28, "addDaun");
 NexButton minDaun3 = NexButton(4, 29, "minDaun");
 
 //KelTanah
-NexNumber tKelTanah3 = NexNumber(4, 35, "tKelTanah");
+NexText tKelTanah3 = NexText(4, 37, "tKelTanah");
 NexText tKelTanahStat3 = NexText(4, 25, "tKelTanahStat");
 NexButton bUkurKelTanah3 = NexButton(4, 26, "bUkurKelTanah");
 
 //Simpan data
 NexButton bSimpan3 = NexButton(4, 23, "bSimpan");
-NexButton Analisa3 = NexButton(4, 36, "Analisa");
+NexButton Analisa3 = NexButton(4, 30, "Analisa");
 NexText tLulus3 = NexText(4, 13, "tLulus");
 //End OF EP0077A PT
 
 //EP0361WK PT
 //Tinggi
-NexNumber tTinggi4 = NexNumber(5, 30, "tTinggi");
+NexText tTinggi4 = NexText(5, 31, "tTinggi");
 NexText tTingStat4 = NexText(5, 14, "tTingStat");
 NexButton bUkurTinggi4 = NexButton(5, 19, "bUkurTinggi");
 
 //Diameter
-NexNumber tDim4 = NexNumber(5, 37, "tDim");
+NexText tDim4 = NexText(5, 32, "tDim");
 NexText tDimStat4 = NexText(5, 15, "tDimStat");
 NexButton bUkurDim4 = NexButton(5, 20, "bUkurDim");
 
 //Panjang internode
-NexNumber tPjg4 = NexNumber(5, 31, "tPjg");
-NexNumber tPjgTing4 = NexNumber(5, 34, "tPjgTing");
+NexText tPjg4 = NexText(5, 34, "tPjg");
+NexText tPjgTing4 = NexText(5, 33, "tPjgTing");
 NexText tPjgStat4 = NexText(5, 16, "tPjgStat");
 NexButton addPjg4 = NexButton(5, 21, "addPjg");
 NexButton minPjg4 = NexButton(5, 27, "minPjg");
 
 //HDRatio
-NexNumber tHdrat4 = NexNumber(5, 32, "tHdrat");
+NexText tHdrat4 = NexText(5, 35, "tHdrat");
 NexText tHdratStat4 = NexText(5, 17, "tHdratStat");
 NexButton bUkurHD4 = NexButton(5, 22, "bUkurHD");
 
 //JmlDaun
-NexNumber tJmlDaun4 = NexNumber(5, 33, "tJmlDaun");
+NexText tJmlDaun4 = NexText(5, 36, "tJmlDaun");
 NexText tJmlDaunStat4 = NexText(5, 18, "tJmlDaunStat");
 NexButton addDaun4 = NexButton(5, 28, "addDaun");
 NexButton minDaun4 = NexButton(5, 29, "minDaun");
 
 //KelTanah
-NexNumber tKelTanah4 = NexNumber(5, 35, "tKelTanah");
+NexText tKelTanah4 = NexText(5, 37, "tKelTanah");
 NexText tKelTanahStat4 = NexText(5, 25, "tKelTanahStat");
 NexButton bUkurKelTanah4 = NexButton(5, 26, "bUkurKelTanah");
 
 //Simpan data
 NexButton bSimpan4 = NexButton(5, 23, "bSimpan");
-NexButton Analisa4 = NexButton(5, 36, "Analisa");
+NexButton Analisa4 = NexButton(5, 30, "Analisa");
 NexText tLulus4 = NexText(5, 13, "tLulus");
 //End OF EP0361WK PT
 
 //CLONE PT
 //Tinggi
-NexNumber tTinggi5 = NexNumber(6, 30, "tTinggi");
+NexText tTinggi5 = NexText(6, 31, "tTinggi");
 NexText tTingStat5 = NexText(6, 14, "tTingStat");
 NexButton bUkurTinggi5 = NexButton(6, 19, "bUkurTinggi");
 
 //Diameter
-NexNumber tDim5 = NexNumber(6, 37, "tDim");
+NexText tDim5 = NexText(6, 32, "tDim");
 NexText tDimStat5 = NexText(6, 15, "tDimStat");
 NexButton bUkurDim5 = NexButton(6, 20, "bUkurDim");
 
 //Panjang internode
-NexNumber tPjg5 = NexNumber(6, 31, "tPjg");
-NexNumber tPjgTing5 = NexNumber(6, 34, "tPjgTing");
+NexText tPjg5 = NexText(6, 34, "tPjg");
+NexText tPjgTing5 = NexText(6, 33, "tPjgTing");
 NexText tPjgStat5 = NexText(6, 16, "tPjgStat");
 NexButton addPjg5 = NexButton(6, 21, "addPjg");
 NexButton minPjg5 = NexButton(6, 27, "minPjg");
 
 //HDRatio
-NexNumber tHdrat5 = NexNumber(6, 32, "tHdrat");
+NexText tHdrat5 = NexText(6, 35, "tHdrat");
 NexText tHdratStat5 = NexText(6, 17, "tHdratStat");
 NexButton bUkurHD5 = NexButton(6, 22, "bUkurHD");
 
 //JmlDaun
-NexNumber tJmlDaun5 = NexNumber(6, 33, "tJmlDaun");
+NexText tJmlDaun5 = NexText(6, 36, "tJmlDaun");
 NexText tJmlDaunStat5 = NexText(6, 18, "tJmlDaunStat");
 NexButton addDaun5 = NexButton(6, 28, "addDaun");
 NexButton minDaun5 = NexButton(6, 29, "minDaun");
 
 //KelTanah
-NexNumber tKelTanah5 = NexNumber(6, 35, "tKelTanah");
+NexText tKelTanah5 = NexText(6, 37, "tKelTanah");
 NexText tKelTanahStat5 = NexText(6, 25, "tKelTanahStat");
 NexButton bUkurKelTanah5 = NexButton(6, 26, "bUkurKelTanah");
 
 //Simpan data
 NexButton bSimpan5 = NexButton(6, 23, "bSimpan");
-NexButton Analisa5 = NexButton(6, 36, "Analisa");
+NexButton Analisa5 = NexButton(6, 30, "Analisa");
 NexText tLulus5 = NexText(6, 13, "tLulus");
 //End OF CLONE PT
 
 //EP0077A PP
 //Tinggi
-NexNumber tTinggi6 = NexNumber(7, 30, "tTinggi");
+NexText tTinggi6 = NexText(7, 31, "tTinggi");
 NexText tTingStat6 = NexText(7, 14, "tTingStat");
 NexButton bUkurTinggi6 = NexButton(7, 19, "bUkurTinggi");
 
 //Diameter
-NexNumber tDim6 = NexNumber(7, 37, "tDim");
+NexText tDim6 = NexText(7, 32, "tDim");
 NexText tDimStat6 = NexText(7, 15, "tDimStat");
 NexButton bUkurDim6 = NexButton(7, 20, "bUkurDim");
 
 //Panjang internode
-NexNumber tPjg6 = NexNumber(7, 31, "tPjg");
-NexNumber tPjgTing6 = NexNumber(7, 34, "tPjgTing");
+NexText tPjg6 = NexText(7, 34, "tPjg");
+NexText tPjgTing6 = NexText(7, 33, "tPjgTing");
 NexText tPjgStat6 = NexText(7, 16, "tPjgStat");
 NexButton addPjg6 = NexButton(7, 21, "addPjg");
 NexButton minPjg6 = NexButton(7, 27, "minPjg");
 
 //HDRatio
-NexNumber tHdrat6 = NexNumber(7, 32, "tHdrat");
+NexText tHdrat6 = NexText(7, 35, "tHdrat");
 NexText tHdratStat6 = NexText(7, 17, "tHdratStat");
 NexButton bUkurHD6 = NexButton(7, 22, "bUkurHD");
 
 //JmlDaun
-NexNumber tJmlDaun6 = NexNumber(7, 33, "tJmlDaun");
+NexText tJmlDaun6 = NexText(7, 36, "tJmlDaun");
 NexText tJmlDaunStat6 = NexText(7, 18, "tJmlDaunStat");
 NexButton addDaun6 = NexButton(7, 28, "addDaun");
 NexButton minDaun6 = NexButton(7, 29, "minDaun");
 
 //KelTanah
-NexNumber tKelTanah6 = NexNumber(7, 35, "tKelTanah");
+NexText tKelTanah6 = NexText(7, 37, "tKelTanah");
 NexText tKelTanahStat6 = NexText(7, 25, "tKelTanahStat");
 NexButton bUkurKelTanah6 = NexButton(7, 26, "bUkurKelTanah");
 
 //Simpan data
 NexButton bSimpan6 = NexButton(7, 23, "bSimpan");
-NexButton Analisa6 = NexButton(7, 36, "Analisa");
+NexButton Analisa6 = NexButton(7, 30, "Analisa");
 NexText tLulus6 = NexText(7, 13, "tLulus");
 //End OF EP0077AA PP
 
 //EP0361WK PP
 //Tinggi
-NexNumber tTinggi7 = NexNumber(8, 30, "tTinggi");
+NexText tTinggi7 = NexText(8, 31, "tTinggi");
 NexText tTingStat7 = NexText(8, 14, "tTingStat");
 NexButton bUkurTinggi7 = NexButton(8, 19, "bUkurTinggi");
 
 //Diameter
-NexNumber tDim7 = NexNumber(8, 37, "tDim");
+NexText tDim7 = NexText(8, 32, "tDim");
 NexText tDimStat7 = NexText(8, 15, "tDimStat");
 NexButton bUkurDim7 = NexButton(8, 20, "bUkurDim");
 
 //Panjang internode
-NexNumber tPjg7 = NexNumber(8, 31, "tPjg");
-NexNumber tPjgTing7 = NexNumber(8, 34, "tPjgTing");
+NexText tPjg7 = NexText(8, 34, "tPjg");
+NexText tPjgTing7 = NexText(8, 33, "tPjgTing");
 NexText tPjgStat7 = NexText(8, 16, "tPjgStat");
 NexButton addPjg7 = NexButton(8, 21, "addPjg");
 NexButton minPjg7 = NexButton(8, 27, "minPjg");
 
 //HDRatio
-NexNumber tHdrat7 = NexNumber(8, 32, "tHdrat");
+NexText tHdrat7 = NexText(8, 35, "tHdrat");
 NexText tHdratStat7 = NexText(8, 17, "tHdratStat");
 NexButton bUkurHD7 = NexButton(8, 22, "bUkurHD");
 
 //JmlDaun
-NexNumber tJmlDaun7 = NexNumber(8, 33, "tJmlDaun");
+NexText tJmlDaun7 = NexText(8, 36, "tJmlDaun");
 NexText tJmlDaunStat7 = NexText(8, 18, "tJmlDaunStat");
 NexButton addDaun7 = NexButton(8, 28, "addDaun");
 NexButton minDaun7 = NexButton(8, 29, "minDaun");
 
 //KelTanah
-NexNumber tKelTanah7 = NexNumber(8, 35, "tKelTanah");
+NexText tKelTanah7 = NexText(8, 37, "tKelTanah");
 NexText tKelTanahStat7 = NexText(8, 25, "tKelTanahStat");
 NexButton bUkurKelTanah7 = NexButton(8, 26, "bUkurKelTanah");
 
 //Simpan data
 NexButton bSimpan7 = NexButton(8, 23, "bSimpan");
-NexButton Analisa7 = NexButton(8, 36, "Analisa");
+NexButton Analisa7 = NexButton(8, 30, "Analisa");
 NexText tLulus7 = NexText(8, 13, "tLulus");
 //End OF EP0361WK PP
 
 //CLONE PP
 //Tinggi
-NexNumber tTinggi8 = NexNumber(9, 30, "tTinggi");
+NexText tTinggi8 = NexText(9, 31, "tTinggi");
 NexText tTingStat8 = NexText(9, 14, "tTingStat");
 NexButton bUkurTinggi8 = NexButton(9, 19, "bUkurTinggi");
 
 //Diameter
-NexNumber tDim8 = NexNumber(9, 37, "tDim");
+NexText tDim8 = NexText(9, 32, "tDim");
 NexText tDimStat8 = NexText(9, 15, "tDimStat");
 NexButton bUkurDim8 = NexButton(9, 20, "bUkurDim");
 
 //Panjang internode
-NexNumber tPjg8 = NexNumber(9, 31, "tPjg");
-NexNumber tPjgTing8 = NexNumber(9, 34, "tPjgTing");
+NexText tPjg8 = NexText(9, 34, "tPjg");
+NexText tPjgTing8 = NexText(9, 33, "tPjgTing");
 NexText tPjgStat8 = NexText(9, 16, "tPjgStat");
 NexButton addPjg8 = NexButton(9, 21, "addPjg");
 NexButton minPjg8 = NexButton(9, 27, "minPjg");
 
 //HDRatio
-NexNumber tHdrat8 = NexNumber(9, 32, "tHdrat");
+NexText tHdrat8 = NexText(9, 35, "tHdrat");
 NexText tHdratStat8 = NexText(9, 17, "tHdratStat");
 NexButton bUkurHD8 = NexButton(9, 22, "bUkurHD");
 
 //JmlDaun
-NexNumber tJmlDaun8 = NexNumber(9, 33, "tJmlDaun");
+NexText tJmlDaun8 = NexText(9, 36, "tJmlDaun");
 NexText tJmlDaunStat8 = NexText(9, 18, "tJmlDaunStat");
 NexButton addDaun8 = NexButton(9, 28, "addDaun");
 NexButton minDaun8 = NexButton(9, 29, "minDaun");
 
 //KelTanah
-NexNumber tKelTanah8 = NexNumber(9, 35, "tKelTanah");
+NexText tKelTanah8 = NexText(9, 37, "tKelTanah");
 NexText tKelTanahStat8 = NexText(9, 25, "tKelTanahStat");
 NexButton bUkurKelTanah8 = NexButton(9, 26, "bUkurKelTanah");
 
 //Simpan data
 NexButton bSimpan8 = NexButton(9, 23, "bSimpan");
-NexButton Analisa8 = NexButton(9, 36, "Analisa");
+NexButton Analisa8 = NexButton(9, 30, "Analisa");
 NexText tLulus8 = NexText(9, 13, "tLulus");
 //End OF CLONE PP
+
+//SELEKSI
+//Tinggi
+NexText tTinggi9 = NexText(11, 5, "tTinggi");
+//Grade
+NexText tGrade9 = NexText(11, 7, "tGrade");
+//Simpan data
+NexButton bSimpan9 = NexButton(11, 3, "bSimpan");
+//End OF SELEKSI
+
+//UKUR DIAMETER
+//Diameter
+NexText tDim10 = NexText(12, 5, "tDim");
+//Simpan data
+NexButton bSimpan10 = NexButton(12, 3, "bSimpan");
+//End OF UKUR DIAMAETER
 
 
 //Register Button
@@ -416,6 +451,13 @@ NexTouch *nex_listen_list[] = {
   &bUkurKelTanah8,
   &Analisa8,
   &bSimpan8,
+  //SELEKSI
+  &tTinggi9,
+  &tGrade9,
+  &bSimpan9,
+  //DIAMETER
+  &tDim10,
+  &bSimpan10,
   NULL
 };
 
@@ -423,6 +465,9 @@ void setup()
 {
   Serial.begin(9600);
   Wire.begin();
+  // Pin Set Up
+  pinMode(DATA_PIN, INPUT);
+  pinMode(CLOCK_PIN, INPUT);
   nexInit();
 
   //Acra seedling
@@ -521,59 +566,77 @@ void setup()
   Analisa8.attachPop(bAnalisaCB8, &Analisa8);
   bSimpan8.attachPop(bSimpanCB8, &bSimpan8);
 
+  //SELEKSI
+  bSimpan9.attachPop(bSimpanCB9, &bSimpan9);
+
+  //DIAMETER
+  bSimpan10.attachPop(bSimpanCB10, &bSimpan10);
+
   dbSerialPrintln("setup done");
 
   sensor.setTimeout(500);
-  if (!sensor.init())
-  {
-    Serial.println("Failed to detect and initialize sensor!");
-    while (1) {}
-  }
-  sensor.startContinuous();
+  //  if (!sensor.init())
+  //  {
+  //    Serial.println("Failed to detect and initialize sensor!");
+  //    while (1) {}
+  //  }
+  //  sensor.startContinuous();
   pinMode(SoilSensor, INPUT);
 }
 
 void loop(void)
 {
   nexLoop(nex_listen_list);
+  //  while (digitalRead(CLOCK_PIN) == LOW) {}  // If clock is LOW wait until it turns to HIGH
+  //  time_now = micros();
+  //  while (digitalRead(CLOCK_PIN) == HIGH) {} // Wait for the end of the HIGH pulse
+  //  if ((micros() - time_now) > 500) {        // If the HIGH pulse was longer than 500 micros we are at the start of a new bit sequence
+  //    decode(); //decode the bit sequence
+  //  }
 }
 
 //Acra Seddling
 //ukur tinggi
 void bUkurTinggiCB(void *ptr) {
-  float nilai = sensor.readRangeContinuousMillimeters() / 10;
+  float nilai = (float)sensor.readRangeContinuousMillimeters() / 10;
   if (nilai >= 30) {
     tTingStat.setText("L");
   } else {
     tTingStat.setText("TL");
   }
-  tTinggi.setValue(nilai);
+  char tinggi[10];
+  dtostrf(nilai, 10, 2, tinggi);
+  tTinggi.setText(tinggi);
 }
 
 //ukur diameter
 void bUkurDimCB(void *ptr) {
-  float nilai = sensor.readRangeContinuousMillimeters();
-  nilai = nilai - 30;
+  float nilai = (float)sensor.readRangeContinuousMillimeters() - batasBawah;
+
   if (nilai >= 3) {
     tDimStat.setText("L");
   } else {
     tDimStat.setText("TL");
   }
-  tDim.setValue(nilai);
+  char dim[10];
+  dtostrf(nilai, 10, 2, dim);
+  tDim.setText(dim);
 }
 
 //ukur pjg internode
 void bAddPjgCB(void *ptr) {
-  uint32_t tinggi = 0;
-  tTinggi.getValue(&tinggi);
+  memset(txtSensorSV, 0, sizeof txtSensorSV);   tTinggi.getText(txtSensorSV, LentxtSensorSV);
+  float tinggi = atoi(txtSensorSV);
+  memset(txtSensorSV, 0, sizeof txtSensorSV);   tPjg.getText(txtSensorSV, LentxtSensorSV);
+  int pjgIn = atoi(txtSensorSV);
 
-  uint32_t pjgIn = 0;
-  tPjg.getValue(&pjgIn);
   pjgIn += 1;
-  tPjg.setValue(pjgIn);
+  dtostrf(pjgIn, 10, 0, result);
+  tPjg.setText(result);
 
   float nilaiIn = tinggi / pjgIn;
-  tPjgTing.setValue(nilaiIn);
+  dtostrf(nilaiIn, 10, 2, result);;
+  tPjgTing.setText(result);
   if (nilaiIn >= 2 && nilaiIn <= 4.5) {
     tPjgStat.setText("L");
   } else {
@@ -582,16 +645,18 @@ void bAddPjgCB(void *ptr) {
 }
 
 void bMinPjgCB(void *ptr) {
-  uint32_t tinggi = 0;
-  tTinggi.getValue(&tinggi);
+  memset(txtSensorSV, 0, sizeof txtSensorSV);   tTinggi.getText(txtSensorSV, LentxtSensorSV);
+  float tinggi = atof(txtSensorSV);
+  memset(txtSensorSV, 0, sizeof txtSensorSV);   tPjg.getText(txtSensorSV, LentxtSensorSV);
+  int pjgIn = atoi(txtSensorSV);
 
-  uint32_t pjgIn = 0;
-  tPjg.getValue(&pjgIn);
   pjgIn -= 1;
-  tPjg.setValue(pjgIn);
+  dtostrf(pjgIn, 10, 0, result);
+  tPjg.setText(result);
 
   float nilaiIn = tinggi / pjgIn;
-  tPjgTing.setValue(nilaiIn);
+  dtostrf(nilaiIn, 10, 2, result);;
+  tPjgTing.setText(result);
   if (nilaiIn >= 2 && nilaiIn <= 4.5) {
     tPjgStat.setText("L");
   } else {
@@ -601,25 +666,29 @@ void bMinPjgCB(void *ptr) {
 
 //ukur HD Rat
 void bUkurHDCB(void *ptr) {
-  uint32_t nilaiH = 0;
-  tTinggi.getValue(&nilaiH);
-  uint32_t nilaiDim = 0;
-  tDim.getValue(&nilaiDim);
+  memset(txtSensorSV, 0, sizeof txtSensorSV);   tTinggi.getText(txtSensorSV, LentxtSensorSV);
+  float nilaiH = atof(txtSensorSV);
+  memset(txtSensorSV, 0, sizeof txtSensorSV);   tDim.getText(txtSensorSV, LentxtSensorSV);
+  float nilaiDim = atof(txtSensorSV);
   float nilaiHD = (nilaiH * 10) / nilaiDim;
+
   if (nilaiHD >= 3) {
     tHdratStat.setText("L");
   } else {
     tHdratStat.setText("TL");
   }
-  tHdrat.setValue(nilaiHD);
+  dtostrf(nilaiHD, 10, 2, result);
+  tHdrat.setText(result);
 }
 
 //ukur jml daun
 void bAddDaunCB(void *ptr) {
-  uint32_t daun = 0;
-  tJmlDaun.getValue(&daun);
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tJmlDaun.getText(txtSensorSV, LentxtSensorSV);
+  int daun = atoi(txtSensorSV);
   daun += 1;
-  tJmlDaun.setValue(daun);
+  dtostrf(daun, 10, 0, result);
+  tJmlDaun.setText(result);
   if (daun >= 4) {
     tJmlDaunStat.setText("L");
   } else {
@@ -628,10 +697,11 @@ void bAddDaunCB(void *ptr) {
 }
 
 void bMinDaunCB(void *ptr) {
-  uint32_t daun = 0;
-  tJmlDaun.getValue(&daun);
+  memset(txtSensorSV, 0, sizeof txtSensorSV);   tJmlDaun.getText(txtSensorSV, LentxtSensorSV);
+  int daun = atoi(txtSensorSV);
   daun -= 1;
-  tJmlDaun.setValue(daun);
+  dtostrf(daun, 10, 0, result);
+  tJmlDaun.setText(result);
   if (daun >= 4) {
     tJmlDaunStat.setText("L");
   } else {
@@ -644,7 +714,8 @@ void bUkurKelTanahCB(void *ptr) {
   float nilai = (1023 - analogRead(SoilSensor));
   nilai = nilai / 1023;
   nilai = nilai * 100;
-  tKelTanah.setValue(nilai);
+  dtostrf(nilai, 10, 2, result);
+  tKelTanah.setText(result);
   if (nilai >= 66) {
     tKelTanahStat.setText("Basah");
   } else if (nilai >= 31) {
@@ -657,42 +728,48 @@ void bUkurKelTanahCB(void *ptr) {
 void bAnalisaCB(void *ptr) {
   int L = 0;
   int TL = 0;
-  uint32_t tinggi = 0;
-  uint32_t diameter = 0;
-  uint32_t panjang = 0;
-  uint32_t hdrat = 0;
-  uint32_t daun = 0;
 
-  tTinggi.getValue(&tinggi);
-  if (tinggi >= 30) {
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tTingStat.getText(txtSensorSV, LentxtSensorSV);
+  String tTingStat = txtSensorSV;
+
+  if (tTingStat == "L") {
     L += 1;
   } else {
     TL += 1;
   }
 
-  tDim.getValue(&diameter);
-  if (diameter >= 3) {
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tDimStat.getText(txtSensorSV, LentxtSensorSV);
+  String tDimStat = txtSensorSV;
+  if (tDimStat == "L") {
     L += 1;
   } else {
     TL += 1;
   }
 
-  tPjgTing.getValue(&panjang);
-  if (panjang >= 2 && panjang <= 4.5) {
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tPjgStat.getText(txtSensorSV, LentxtSensorSV);
+  String tPjgStat = txtSensorSV;
+  if (tPjgStat == "L") {
     L += 1;
   } else {
     TL += 1;
   }
 
-  tHdrat.getValue(&hdrat);
-  if (hdrat >= 3) {
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tHdratStat.getText(txtSensorSV, LentxtSensorSV);
+  String tHdratStat = txtSensorSV;
+  if (tHdratStat == "L") {
     L += 1;
   } else {
     TL += 1;
   }
 
-  tJmlDaun.getValue(&daun);
-  if (daun >= 4) {
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tJmlDaunStat.getText(txtSensorSV, LentxtSensorSV);
+  String tJmlDaunStat = txtSensorSV;
+  if (tJmlDaunStat == "L") {
     L += 1;
   } else {
     TL += 1;
@@ -713,39 +790,45 @@ void bSimpanCB(void *ptr) {
 //Acra Cutting
 //ukur tinggi
 void bUkurTinggiCB2(void *ptr) {
-  float nilai = sensor.readRangeContinuousMillimeters() / 10;
+  float nilai = (float)sensor.readRangeContinuousMillimeters() / 10;
   if (nilai >= 30) {
     tTingStat2.setText("L");
   } else {
     tTingStat2.setText("TL");
   }
-  tTinggi2.setValue(nilai);
+  char tinggi[10];
+  dtostrf(nilai, 10, 2, tinggi);
+  tTinggi2.setText(tinggi);
 }
 
 //ukur diameter
 void bUkurDimCB2(void *ptr) {
-  float nilai = sensor.readRangeContinuousMillimeters();
-  nilai = nilai - 30;
+  float nilai = (float)sensor.readRangeContinuousMillimeters() - batasBawah;
+
   if (nilai >= 3) {
     tDimStat2.setText("L");
   } else {
     tDimStat2.setText("TL");
   }
-  tDim2.setValue(nilai);
+  char dim[10];
+  dtostrf(nilai, 10, 2, dim);
+  tDim2.setText(dim);
 }
 
 //ukur pjg internode
 void bAddPjgCB2(void *ptr) {
-  uint32_t tinggi = 0;
-  tTinggi2.getValue(&tinggi);
+  memset(txtSensorSV, 0, sizeof txtSensorSV);   tTinggi2.getText(txtSensorSV, LentxtSensorSV);
+  float tinggi = atof(txtSensorSV);
+  memset(txtSensorSV, 0, sizeof txtSensorSV);   tPjg2.getText(txtSensorSV, LentxtSensorSV);
+  int pjgIn = atoi(txtSensorSV);
 
-  uint32_t pjgIn = 0;
-  tPjg2.getValue(&pjgIn);
   pjgIn += 1;
-  tPjg2.setValue(pjgIn);
+  dtostrf(pjgIn, 10, 0, result);
+  tPjg2.setText(result);
 
   float nilaiIn = tinggi / pjgIn;
-  tPjgTing2.setValue(nilaiIn);
+  dtostrf(nilaiIn, 10, 2, result);;
+  tPjgTing2.setText(result);
   if (nilaiIn >= 2 && nilaiIn <= 4.5) {
     tPjgStat2.setText("L");
   } else {
@@ -754,16 +837,18 @@ void bAddPjgCB2(void *ptr) {
 }
 
 void bMinPjgCB2(void *ptr) {
-  uint32_t tinggi = 0;
-  tTinggi2.getValue(&tinggi);
+  memset(txtSensorSV, 0, sizeof txtSensorSV);   tTinggi2.getText(txtSensorSV, LentxtSensorSV);
+  float tinggi = atof(txtSensorSV);
+  memset(txtSensorSV, 0, sizeof txtSensorSV);   tPjg2.getText(txtSensorSV, LentxtSensorSV);
+  int pjgIn = atoi(txtSensorSV);
 
-  uint32_t pjgIn = 0;
-  tPjg2.getValue(&pjgIn);
   pjgIn -= 1;
-  tPjg2.setValue(pjgIn);
+  dtostrf(pjgIn, 10, 0, result);
+  tPjg2.setText(result);
 
   float nilaiIn = tinggi / pjgIn;
-  tPjgTing2.setValue(nilaiIn);
+  dtostrf(nilaiIn, 10, 2, result);;
+  tPjgTing2.setText(result);
   if (nilaiIn >= 2 && nilaiIn <= 4.5) {
     tPjgStat2.setText("L");
   } else {
@@ -773,25 +858,28 @@ void bMinPjgCB2(void *ptr) {
 
 //ukur HD Rat
 void bUkurHDCB2(void *ptr) {
-  uint32_t nilaiH = 0;
-  tTinggi2.getValue(&nilaiH);
-  uint32_t nilaiDim = 0;
-  tDim2.getValue(&nilaiDim);
+  memset(txtSensorSV, 0, sizeof txtSensorSV);   tTinggi2.getText(txtSensorSV, LentxtSensorSV);
+  float nilaiH = atof(txtSensorSV);
+  memset(txtSensorSV, 0, sizeof txtSensorSV);   tDim2.getText(txtSensorSV, LentxtSensorSV);
+  float nilaiDim = atof(txtSensorSV);
   float nilaiHD = (nilaiH * 10) / nilaiDim;
+
   if (nilaiHD <= 12) {
     tHdratStat2.setText("L");
   } else {
     tHdratStat2.setText("TL");
   }
-  tHdrat2.setValue(nilaiHD);
+  dtostrf(nilaiHD, 10, 2, result);
+  tHdrat2.setText(result);
 }
 
 //ukur jml daun
 void bAddDaunCB2(void *ptr) {
-  uint32_t daun = 0;
-  tJmlDaun2.getValue(&daun);
+  memset(txtSensorSV, 0, sizeof txtSensorSV);   tJmlDaun2.getText(txtSensorSV, LentxtSensorSV);
+  int daun = atoi(txtSensorSV);
   daun += 1;
-  tJmlDaun2.setValue(daun);
+  dtostrf(daun, 10, 0, result);
+  tJmlDaun2.setText(result);
   if (daun >= 5) {
     tJmlDaunStat2.setText("L");
   } else {
@@ -800,10 +888,11 @@ void bAddDaunCB2(void *ptr) {
 }
 
 void bMinDaunCB2(void *ptr) {
-  uint32_t daun = 0;
-  tJmlDaun2.getValue(&daun);
+  memset(txtSensorSV, 0, sizeof txtSensorSV);   tJmlDaun2.getText(txtSensorSV, LentxtSensorSV);
+  int daun = atoi(txtSensorSV);
   daun -= 1;
-  tJmlDaun2.setValue(daun);
+  dtostrf(daun, 10, 0, result);
+  tJmlDaun2.setText(result);
   if (daun >= 5) {
     tJmlDaunStat2.setText("L");
   } else {
@@ -816,7 +905,8 @@ void bUkurKelTanahCB2(void *ptr) {
   float nilai = (1023 - analogRead(SoilSensor));
   nilai = nilai / 1023;
   nilai = nilai * 100;
-  tKelTanah2.setValue(nilai);
+  dtostrf(nilai, 10, 2, result);
+  tKelTanah2.setText(result);
   if (nilai >= 66) {
     tKelTanahStat2.setText("Basah");
   } else if (nilai >= 31) {
@@ -829,42 +919,48 @@ void bUkurKelTanahCB2(void *ptr) {
 void bAnalisaCB2(void *ptr) {
   int L = 0;
   int TL = 0;
-  uint32_t tinggi = 0;
-  uint32_t diameter = 0;
-  uint32_t panjang = 0;
-  uint32_t hdrat = 0;
-  uint32_t daun = 0;
 
-  tTinggi2.getValue(&tinggi);
-  if (tinggi >= 30) {
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tTingStat2.getText(txtSensorSV, LentxtSensorSV);
+  String tTingStat = txtSensorSV;
+
+  if (tTingStat == "L") {
     L += 1;
   } else {
     TL += 1;
   }
 
-  tDim2.getValue(&diameter);
-  if (diameter >= 3) {
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tDimStat2.getText(txtSensorSV, LentxtSensorSV);
+  String tDimStat = txtSensorSV;
+  if (tDimStat == "L") {
     L += 1;
   } else {
     TL += 1;
   }
 
-  tPjgTing2.getValue(&panjang);
-  if (panjang >= 2 && panjang <= 4.5) {
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tPjgStat2.getText(txtSensorSV, LentxtSensorSV);
+  String tPjgStat = txtSensorSV;
+  if (tPjgStat == "L") {
     L += 1;
   } else {
     TL += 1;
   }
 
-  tHdrat2.getValue(&hdrat);
-  if (hdrat <= 12) {
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tHdratStat2.getText(txtSensorSV, LentxtSensorSV);
+  String tHdratStat = txtSensorSV;
+  if (tHdratStat == "L") {
     L += 1;
   } else {
     TL += 1;
   }
 
-  tJmlDaun2.getValue(&daun);
-  if (daun >= 5) {
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tJmlDaunStat2.getText(txtSensorSV, LentxtSensorSV);
+  String tJmlDaunStat = txtSensorSV;
+  if (tJmlDaunStat == "L") {
     L += 1;
   } else {
     TL += 1;
@@ -885,39 +981,45 @@ void bSimpanCB2(void *ptr) {
 //EP0077A PT
 //ukur tinggi
 void bUkurTinggiCB3(void *ptr) {
-  float nilai = sensor.readRangeContinuousMillimeters() / 10;
+  float nilai = (float)sensor.readRangeContinuousMillimeters() / 10;
   if (nilai >= 25 && nilai <= 45) {
     tTingStat3.setText("L");
   } else {
     tTingStat3.setText("TL");
   }
-  tTinggi3.setValue(nilai);
+  char tinggi[10];
+  dtostrf(nilai, 10, 2, tinggi);
+  tTinggi3.setText(tinggi);
 }
 
 //ukur diameter
 void bUkurDimCB3(void *ptr) {
-  float nilai = sensor.readRangeContinuousMillimeters();
-  nilai = nilai - 30;
+  float nilai = (float)sensor.readRangeContinuousMillimeters() - batasBawah;
+
   if (nilai >= 2.2) {
     tDimStat3.setText("L");
   } else {
     tDimStat3.setText("TL");
   }
-  tDim3.setValue(nilai);
+  char dim[10];
+  dtostrf(nilai, 10, 2, dim);
+  tDim3.setText(dim);
 }
 
 //ukur pjg internode
 void bAddPjgCB3(void *ptr) {
-  uint32_t tinggi = 0;
-  tTinggi3.getValue(&tinggi);
+  memset(txtSensorSV, 0, sizeof txtSensorSV);   tTinggi3.getText(txtSensorSV, LentxtSensorSV);
+  float tinggi = atof(txtSensorSV);
+  memset(txtSensorSV, 0, sizeof txtSensorSV);   tPjg3.getText(txtSensorSV, LentxtSensorSV);
+  int pjgIn = atoi(txtSensorSV);
 
-  uint32_t pjgIn = 0;
-  tPjg3.getValue(&pjgIn);
   pjgIn += 1;
-  tPjg3.setValue(pjgIn);
+  dtostrf(pjgIn, 10, 0, result);
+  tPjg3.setText(result);
 
   float nilaiIn = tinggi / pjgIn;
-  tPjgTing3.setValue(nilaiIn);
+  dtostrf(nilaiIn, 10, 2, result);;
+  tPjgTing3.setText(result);
   if (nilaiIn >= 1.2 && nilaiIn <= 2.4) {
     tPjgStat3.setText("L");
   } else {
@@ -926,16 +1028,18 @@ void bAddPjgCB3(void *ptr) {
 }
 
 void bMinPjgCB3(void *ptr) {
-  uint32_t tinggi = 0;
-  tTinggi3.getValue(&tinggi);
+  memset(txtSensorSV, 0, sizeof txtSensorSV);   tTinggi3.getText(txtSensorSV, LentxtSensorSV);
+  float tinggi = atof(txtSensorSV);
+  memset(txtSensorSV, 0, sizeof txtSensorSV);   tPjg3.getText(txtSensorSV, LentxtSensorSV);
+  int pjgIn = atoi(txtSensorSV);
 
-  uint32_t pjgIn = 0;
-  tPjg3.getValue(&pjgIn);
   pjgIn -= 1;
-  tPjg3.setValue(pjgIn);
+  dtostrf(pjgIn, 10, 0, result);
+  tPjg3.setText(result);
 
   float nilaiIn = tinggi / pjgIn;
-  tPjgTing3.setValue(nilaiIn);
+  dtostrf(nilaiIn, 10, 2, result);;
+  tPjgTing3.setText(result);
   if (nilaiIn >= 1.2 && nilaiIn <= 2.4) {
     tPjgStat3.setText("L");
   } else {
@@ -945,25 +1049,28 @@ void bMinPjgCB3(void *ptr) {
 
 //ukur HD Rat
 void bUkurHDCB3(void *ptr) {
-  uint32_t nilaiH = 0;
-  tTinggi3.getValue(&nilaiH);
-  uint32_t nilaiDim = 0;
-  tDim3.getValue(&nilaiDim);
+  memset(txtSensorSV, 0, sizeof txtSensorSV);   tTinggi3.getText(txtSensorSV, LentxtSensorSV);
+  float nilaiH = atof(txtSensorSV);
+  memset(txtSensorSV, 0, sizeof txtSensorSV);   tDim3.getText(txtSensorSV, LentxtSensorSV);
+  float nilaiDim = atof(txtSensorSV);
   float nilaiHD = (nilaiH * 10) / nilaiDim;
+
   if (nilaiHD <= 11) {
     tHdratStat3.setText("L");
   } else {
     tHdratStat3.setText("TL");
   }
-  tHdrat3.setValue(nilaiHD);
+  dtostrf(nilaiHD, 10, 2, result);
+  tHdrat3.setText(result);
 }
 
 //ukur jml daun
 void bAddDaunCB3(void *ptr) {
-  uint32_t daun = 0;
-  tJmlDaun3.getValue(&daun);
+  memset(txtSensorSV, 0, sizeof txtSensorSV);   tJmlDaun3.getText(txtSensorSV, LentxtSensorSV);
+  int daun = atoi(txtSensorSV);
   daun += 1;
-  tJmlDaun2.setValue(daun);
+  dtostrf(daun, 10, 0, result);
+  tJmlDaun3.setText(result);
   if (daun >= 5) {
     tJmlDaunStat3.setText("L");
   } else {
@@ -972,10 +1079,11 @@ void bAddDaunCB3(void *ptr) {
 }
 
 void bMinDaunCB3(void *ptr) {
-  uint32_t daun = 0;
-  tJmlDaun3.getValue(&daun);
+  memset(txtSensorSV, 0, sizeof txtSensorSV);   tJmlDaun3.getText(txtSensorSV, LentxtSensorSV);
+  int daun = atoi(txtSensorSV);
   daun -= 1;
-  tJmlDaun3.setValue(daun);
+  dtostrf(daun, 10, 0, result);
+  tJmlDaun3.setText(result);
   if (daun >= 5) {
     tJmlDaunStat3.setText("L");
   } else {
@@ -988,7 +1096,8 @@ void bUkurKelTanahCB3(void *ptr) {
   float nilai = (1023 - analogRead(SoilSensor));
   nilai = nilai / 1023;
   nilai = nilai * 100;
-  tKelTanah3.setValue(nilai);
+  dtostrf(nilai, 10, 2, result);
+  tKelTanah3.setText(result);
   if (nilai >= 66) {
     tKelTanahStat3.setText("Basah");
   } else if (nilai >= 31) {
@@ -1001,42 +1110,48 @@ void bUkurKelTanahCB3(void *ptr) {
 void bAnalisaCB3(void *ptr) {
   int L = 0;
   int TL = 0;
-  uint32_t tinggi = 0;
-  uint32_t diameter = 0;
-  uint32_t panjang = 0;
-  uint32_t hdrat = 0;
-  uint32_t daun = 0;
 
-  tTinggi3.getValue(&tinggi);
-  if (tinggi >= 25 && tinggi <= 45) {
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tTingStat3.getText(txtSensorSV, LentxtSensorSV);
+  String tTingStat = txtSensorSV;
+
+  if (tTingStat == "L") {
     L += 1;
   } else {
     TL += 1;
   }
 
-  tDim3.getValue(&diameter);
-  if (diameter >= 2.2) {
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tDimStat3.getText(txtSensorSV, LentxtSensorSV);
+  String tDimStat = txtSensorSV;
+  if (tDimStat == "L") {
     L += 1;
   } else {
     TL += 1;
   }
 
-  tPjgTing3.getValue(&panjang);
-  if (panjang >= 1.2 && panjang <= 2.4) {
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tPjgStat3.getText(txtSensorSV, LentxtSensorSV);
+  String tPjgStat = txtSensorSV;
+  if (tPjgStat == "L") {
     L += 1;
   } else {
     TL += 1;
   }
 
-  tHdrat3.getValue(&hdrat);
-  if (hdrat <= 11) {
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tHdratStat3.getText(txtSensorSV, LentxtSensorSV);
+  String tHdratStat = txtSensorSV;
+  if (tHdratStat == "L") {
     L += 1;
   } else {
     TL += 1;
   }
 
-  tJmlDaun3.getValue(&daun);
-  if (daun >= 5) {
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tJmlDaunStat3.getText(txtSensorSV, LentxtSensorSV);
+  String tJmlDaunStat = txtSensorSV;
+  if (tJmlDaunStat == "L") {
     L += 1;
   } else {
     TL += 1;
@@ -1057,39 +1172,45 @@ void bSimpanCB3(void *ptr) {
 //EP0361WK PT
 //ukur tinggi
 void bUkurTinggiCB4(void *ptr) {
-  float nilai = sensor.readRangeContinuousMillimeters() / 10;
+  float nilai = (float)sensor.readRangeContinuousMillimeters() / 10;
   if (nilai >= 30 && nilai <= 50) {
     tTingStat4.setText("L");
   } else {
     tTingStat4.setText("TL");
   }
-  tTinggi4.setValue(nilai);
+  char tinggi[10];
+  dtostrf(nilai, 10, 2, tinggi);
+  tTinggi4.setText(tinggi);
 }
 
 //ukur diameter
 void bUkurDimCB4(void *ptr) {
-  float nilai = sensor.readRangeContinuousMillimeters();
-  nilai = nilai - 30;
+  float nilai = (float)sensor.readRangeContinuousMillimeters() - batasBawah;
+
   if (nilai >= 2.7) {
     tDimStat4.setText("L");
   } else {
     tDimStat4.setText("TL");
   }
-  tDim4.setValue(nilai);
+  char dim[10];
+  dtostrf(nilai, 10, 2, dim);
+  tDim4.setText(dim);
 }
 
 //ukur pjg internode
 void bAddPjgCB4(void *ptr) {
-  uint32_t tinggi = 0;
-  tTinggi4.getValue(&tinggi);
+  memset(txtSensorSV, 0, sizeof txtSensorSV);   tTinggi4.getText(txtSensorSV, LentxtSensorSV);
+  float tinggi = atof(txtSensorSV);
+  memset(txtSensorSV, 0, sizeof txtSensorSV);   tPjg4.getText(txtSensorSV, LentxtSensorSV);
+  int pjgIn = atoi(txtSensorSV);
 
-  uint32_t pjgIn = 0;
-  tPjg4.getValue(&pjgIn);
   pjgIn += 1;
-  tPjg4.setValue(pjgIn);
+  dtostrf(pjgIn, 10, 0, result);
+  tPjg4.setText(result);
 
   float nilaiIn = tinggi / pjgIn;
-  tPjgTing4.setValue(nilaiIn);
+  dtostrf(nilaiIn, 10, 2, result);;
+  tPjgTing4.setText(result);
   if (nilaiIn >= 1.2 && nilaiIn <= 2.4) {
     tPjgStat4.setText("L");
   } else {
@@ -1098,16 +1219,18 @@ void bAddPjgCB4(void *ptr) {
 }
 
 void bMinPjgCB4(void *ptr) {
-  uint32_t tinggi = 0;
-  tTinggi4.getValue(&tinggi);
+  memset(txtSensorSV, 0, sizeof txtSensorSV);   tTinggi4.getText(txtSensorSV, LentxtSensorSV);
+  float tinggi = atof(txtSensorSV);
+  memset(txtSensorSV, 0, sizeof txtSensorSV);   tPjg4.getText(txtSensorSV, LentxtSensorSV);
+  int pjgIn = atoi(txtSensorSV);
 
-  uint32_t pjgIn = 0;
-  tPjg4.getValue(&pjgIn);
   pjgIn -= 1;
-  tPjg4.setValue(pjgIn);
+  dtostrf(pjgIn, 10, 0, result);
+  tPjg4.setText(result);
 
   float nilaiIn = tinggi / pjgIn;
-  tPjgTing4.setValue(nilaiIn);
+  dtostrf(nilaiIn, 10, 2, result);;
+  tPjgTing4.setText(result);
   if (nilaiIn >= 1.2 && nilaiIn <= 2.4) {
     tPjgStat4.setText("L");
   } else {
@@ -1117,25 +1240,28 @@ void bMinPjgCB4(void *ptr) {
 
 //ukur HD Rat
 void bUkurHDCB4(void *ptr) {
-  uint32_t nilaiH = 0;
-  tTinggi4.getValue(&nilaiH);
-  uint32_t nilaiDim = 0;
-  tDim4.getValue(&nilaiDim);
+  memset(txtSensorSV, 0, sizeof txtSensorSV);   tTinggi4.getText(txtSensorSV, LentxtSensorSV);
+  float nilaiH = atof(txtSensorSV);
+  memset(txtSensorSV, 0, sizeof txtSensorSV);   tDim4.getText(txtSensorSV, LentxtSensorSV);
+  float nilaiDim = atof(txtSensorSV);
   float nilaiHD = (nilaiH * 10) / nilaiDim;
+
   if (nilaiHD <= 12) {
     tHdratStat4.setText("L");
   } else {
     tHdratStat4.setText("TL");
   }
-  tHdrat4.setValue(nilaiHD);
+  dtostrf(nilaiHD, 10, 2, result);
+  tHdrat4.setText(result);
 }
 
 //ukur jml daun
 void bAddDaunCB4(void *ptr) {
-  uint32_t daun = 0;
-  tJmlDaun4.getValue(&daun);
+  memset(txtSensorSV, 0, sizeof txtSensorSV);   tJmlDaun4.getText(txtSensorSV, LentxtSensorSV);
+  int daun = atoi(txtSensorSV);
   daun += 1;
-  tJmlDaun4.setValue(daun);
+  dtostrf(daun, 10, 0, result);
+  tJmlDaun4.setText(result);
   if (daun >= 5) {
     tJmlDaunStat4.setText("L");
   } else {
@@ -1144,10 +1270,11 @@ void bAddDaunCB4(void *ptr) {
 }
 
 void bMinDaunCB4(void *ptr) {
-  uint32_t daun = 0;
-  tJmlDaun4.getValue(&daun);
+  memset(txtSensorSV, 0, sizeof txtSensorSV);   tJmlDaun4.getText(txtSensorSV, LentxtSensorSV);
+  int daun = atoi(txtSensorSV);
   daun -= 1;
-  tJmlDaun4.setValue(daun);
+  dtostrf(daun, 10, 0, result);
+  tJmlDaun4.setText(result);
   if (daun >= 5) {
     tJmlDaunStat4.setText("L");
   } else {
@@ -1160,7 +1287,8 @@ void bUkurKelTanahCB4(void *ptr) {
   float nilai = (1023 - analogRead(SoilSensor));
   nilai = nilai / 1023;
   nilai = nilai * 100;
-  tKelTanah4.setValue(nilai);
+  dtostrf(nilai, 10, 2, result);
+  tKelTanah4.setText(result);
   if (nilai >= 66) {
     tKelTanahStat4.setText("Basah");
   } else if (nilai >= 31) {
@@ -1173,42 +1301,48 @@ void bUkurKelTanahCB4(void *ptr) {
 void bAnalisaCB4(void *ptr) {
   int L = 0;
   int TL = 0;
-  uint32_t tinggi = 0;
-  uint32_t diameter = 0;
-  uint32_t panjang = 0;
-  uint32_t hdrat = 0;
-  uint32_t daun = 0;
 
-  tTinggi4.getValue(&tinggi);
-  if (tinggi >= 30 && tinggi <= 50) {
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tTingStat4.getText(txtSensorSV, LentxtSensorSV);
+  String tTingStat = txtSensorSV;
+
+  if (tTingStat == "L") {
     L += 1;
   } else {
     TL += 1;
   }
 
-  tDim4.getValue(&diameter);
-  if (diameter >= 2.7) {
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tDimStat4.getText(txtSensorSV, LentxtSensorSV);
+  String tDimStat = txtSensorSV;
+  if (tDimStat == "L") {
     L += 1;
   } else {
     TL += 1;
   }
 
-  tPjgTing4.getValue(&panjang);
-  if (panjang >= 1.2 && panjang <= 2.4) {
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tPjgStat4.getText(txtSensorSV, LentxtSensorSV);
+  String tPjgStat = txtSensorSV;
+  if (tPjgStat == "L") {
     L += 1;
   } else {
     TL += 1;
   }
 
-  tHdrat4.getValue(&hdrat);
-  if (hdrat <= 12) {
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tHdratStat4.getText(txtSensorSV, LentxtSensorSV);
+  String tHdratStat = txtSensorSV;
+  if (tHdratStat == "L") {
     L += 1;
   } else {
     TL += 1;
   }
 
-  tJmlDaun4.getValue(&daun);
-  if (daun >= 5) {
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tJmlDaunStat4.getText(txtSensorSV, LentxtSensorSV);
+  String tJmlDaunStat = txtSensorSV;
+  if (tJmlDaunStat == "L") {
     L += 1;
   } else {
     TL += 1;
@@ -1229,39 +1363,45 @@ void bSimpanCB4(void *ptr) {
 //CLONE PT
 //ukur tinggi
 void bUkurTinggiCB5(void *ptr) {
-  float nilai = sensor.readRangeContinuousMillimeters() / 10;
+  float nilai = (float)sensor.readRangeContinuousMillimeters() / 10;
   if (nilai >= 25 && nilai <= 50) {
     tTingStat5.setText("L");
   } else {
     tTingStat5.setText("TL");
   }
-  tTinggi5.setValue(nilai);
+  char tinggi[10];
+  dtostrf(nilai, 10, 2, tinggi);
+  tTinggi5.setText(tinggi);
 }
 
 //ukur diameter
 void bUkurDimCB5(void *ptr) {
-  float nilai = sensor.readRangeContinuousMillimeters();
-  nilai = nilai - 30;
+  float nilai = (float)sensor.readRangeContinuousMillimeters() - batasBawah;
+
   if (nilai >= 2.2) {
     tDimStat5.setText("L");
   } else {
     tDimStat5.setText("TL");
   }
-  tDim5.setValue(nilai);
+  char dim[10];
+  dtostrf(nilai, 10, 2, dim);
+  tDim5.setText(dim);
 }
 
 //ukur pjg internode
 void bAddPjgCB5(void *ptr) {
-  uint32_t tinggi = 0;
-  tTinggi5.getValue(&tinggi);
+  memset(txtSensorSV, 0, sizeof txtSensorSV);   tTinggi5.getText(txtSensorSV, LentxtSensorSV);
+  float tinggi = atof(txtSensorSV);
+  memset(txtSensorSV, 0, sizeof txtSensorSV);   tPjg5.getText(txtSensorSV, LentxtSensorSV);
+  int pjgIn = atoi(txtSensorSV);
 
-  uint32_t pjgIn = 0;
-  tPjg5.getValue(&pjgIn);
   pjgIn += 1;
-  tPjg5.setValue(pjgIn);
+  dtostrf(pjgIn, 10, 0, result);
+  tPjg5.setText(result);
 
   float nilaiIn = tinggi / pjgIn;
-  tPjgTing5.setValue(nilaiIn);
+  dtostrf(nilaiIn, 10, 2, result);;
+  tPjgTing5.setText(result);
   if (nilaiIn >= 1.4 && nilaiIn <= 2.2) {
     tPjgStat5.setText("L");
   } else {
@@ -1270,16 +1410,18 @@ void bAddPjgCB5(void *ptr) {
 }
 
 void bMinPjgCB5(void *ptr) {
-  uint32_t tinggi = 0;
-  tTinggi5.getValue(&tinggi);
+  memset(txtSensorSV, 0, sizeof txtSensorSV);   tTinggi5.getText(txtSensorSV, LentxtSensorSV);
+  float tinggi = atof(txtSensorSV);
+  memset(txtSensorSV, 0, sizeof txtSensorSV);   tPjg5.getText(txtSensorSV, LentxtSensorSV);
+  int pjgIn = atoi(txtSensorSV);
 
-  uint32_t pjgIn = 0;
-  tPjg5.getValue(&pjgIn);
   pjgIn -= 1;
-  tPjg5.setValue(pjgIn);
+  dtostrf(pjgIn, 10, 0, result);
+  tPjg5.setText(result);
 
   float nilaiIn = tinggi / pjgIn;
-  tPjgTing5.setValue(nilaiIn);
+  dtostrf(nilaiIn, 10, 2, result);;
+  tPjgTing5.setText(result);
   if (nilaiIn >= 1.4 && nilaiIn <= 2.2) {
     tPjgStat5.setText("L");
   } else {
@@ -1289,25 +1431,28 @@ void bMinPjgCB5(void *ptr) {
 
 //ukur HD Rat
 void bUkurHDCB5(void *ptr) {
-  uint32_t nilaiH = 0;
-  tTinggi5.getValue(&nilaiH);
-  uint32_t nilaiDim = 0;
-  tDim5.getValue(&nilaiDim);
+  memset(txtSensorSV, 0, sizeof txtSensorSV);   tTinggi5.getText(txtSensorSV, LentxtSensorSV);
+  float nilaiH = atof(txtSensorSV);
+  memset(txtSensorSV, 0, sizeof txtSensorSV);   tDim5.getText(txtSensorSV, LentxtSensorSV);
+  float nilaiDim = atof(txtSensorSV);
   float nilaiHD = (nilaiH * 10) / nilaiDim;
+
   if (nilaiHD <= 11) {
     tHdratStat5.setText("L");
   } else {
     tHdratStat5.setText("TL");
   }
-  tHdrat5.setValue(nilaiHD);
+  dtostrf(nilaiHD, 10, 2, result);
+  tHdrat5.setText(result);
 }
 
 //ukur jml daun
 void bAddDaunCB5(void *ptr) {
-  uint32_t daun = 0;
-  tJmlDaun5.getValue(&daun);
+  memset(txtSensorSV, 0, sizeof txtSensorSV);   tJmlDaun5.getText(txtSensorSV, LentxtSensorSV);
+  int daun = atoi(txtSensorSV);
   daun += 1;
-  tJmlDaun5.setValue(daun);
+  dtostrf(daun, 10, 0, result);
+  tJmlDaun5.setText(result);
   if (daun >= 5) {
     tJmlDaunStat5.setText("L");
   } else {
@@ -1316,10 +1461,11 @@ void bAddDaunCB5(void *ptr) {
 }
 
 void bMinDaunCB5(void *ptr) {
-  uint32_t daun = 0;
-  tJmlDaun5.getValue(&daun);
-  daun -= 1;
-  tJmlDaun5.setValue(daun);
+  memset(txtSensorSV, 0, sizeof txtSensorSV);   tJmlDaun5.getText(txtSensorSV, LentxtSensorSV);
+  int daun = atoi(txtSensorSV);
+  daun += 1;
+  dtostrf(daun, 10, 0, result);
+  tJmlDaun5.setText(result);
   if (daun >= 5) {
     tJmlDaunStat5.setText("L");
   } else {
@@ -1332,7 +1478,8 @@ void bUkurKelTanahCB5(void *ptr) {
   float nilai = (1023 - analogRead(SoilSensor));
   nilai = nilai / 1023;
   nilai = nilai * 100;
-  tKelTanah5.setValue(nilai);
+  dtostrf(nilai, 10, 2, result);
+  tKelTanah5.setText(result);
   if (nilai >= 66) {
     tKelTanahStat5.setText("Basah");
   } else if (nilai >= 31) {
@@ -1345,42 +1492,48 @@ void bUkurKelTanahCB5(void *ptr) {
 void bAnalisaCB5(void *ptr) {
   int L = 0;
   int TL = 0;
-  uint32_t tinggi = 0;
-  uint32_t diameter = 0;
-  uint32_t panjang = 0;
-  uint32_t hdrat = 0;
-  uint32_t daun = 0;
 
-  tTinggi5.getValue(&tinggi);
-  if (tinggi >= 25 && tinggi <= 50) {
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tTingStat5.getText(txtSensorSV, LentxtSensorSV);
+  String tTingStat = txtSensorSV;
+
+  if (tTingStat == "L") {
     L += 1;
   } else {
     TL += 1;
   }
 
-  tDim5.getValue(&diameter);
-  if (diameter >= 2.2) {
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tDimStat5.getText(txtSensorSV, LentxtSensorSV);
+  String tDimStat = txtSensorSV;
+  if (tDimStat == "L") {
     L += 1;
   } else {
     TL += 1;
   }
 
-  tPjgTing5.getValue(&panjang);
-  if (panjang >= 1.4 && panjang <= 2.2) {
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tPjgStat5.getText(txtSensorSV, LentxtSensorSV);
+  String tPjgStat = txtSensorSV;
+  if (tPjgStat == "L") {
     L += 1;
   } else {
     TL += 1;
   }
 
-  tHdrat5.getValue(&hdrat);
-  if (hdrat <= 11) {
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tHdratStat5.getText(txtSensorSV, LentxtSensorSV);
+  String tHdratStat = txtSensorSV;
+  if (tHdratStat == "L") {
     L += 1;
   } else {
     TL += 1;
   }
 
-  tJmlDaun5.getValue(&daun);
-  if (daun >= 5) {
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tJmlDaunStat5.getText(txtSensorSV, LentxtSensorSV);
+  String tJmlDaunStat = txtSensorSV;
+  if (tJmlDaunStat == "L") {
     L += 1;
   } else {
     TL += 1;
@@ -1401,39 +1554,45 @@ void bSimpanCB5(void *ptr) {
 //EP0077AA PP
 //ukur tinggi
 void bUkurTinggiCB6(void *ptr) {
-  float nilai = sensor.readRangeContinuousMillimeters() / 10;
+  float nilai = (float)sensor.readRangeContinuousMillimeters() / 10;
   if (nilai >= 30 && nilai <= 50) {
     tTingStat6.setText("L");
   } else {
     tTingStat6.setText("TL");
   }
-  tTinggi6.setValue(nilai);
+  char tinggi[10];
+  dtostrf(nilai, 10, 2, tinggi);
+  tTinggi6.setText(tinggi);
 }
 
 //ukur diameter
 void bUkurDimCB6(void *ptr) {
-  float nilai = sensor.readRangeContinuousMillimeters();
-  nilai = nilai - 30;
+  float nilai = (float)sensor.readRangeContinuousMillimeters() - batasBawah;
+
   if (nilai >= 2.3) {
     tDimStat6.setText("L");
   } else {
     tDimStat6.setText("TL");
   }
-  tDim6.setValue(nilai);
+  char dim[10];
+  dtostrf(nilai, 10, 2, dim);
+  tDim6.setText(dim);
 }
 
 //ukur pjg internode
 void bAddPjgCB6(void *ptr) {
-  uint32_t tinggi = 0;
-  tTinggi6.getValue(&tinggi);
+  memset(txtSensorSV, 0, sizeof txtSensorSV);   tTinggi6.getText(txtSensorSV, LentxtSensorSV);
+  float tinggi = atof(txtSensorSV);
+  memset(txtSensorSV, 0, sizeof txtSensorSV);   tPjg6.getText(txtSensorSV, LentxtSensorSV);
+  int pjgIn = atoi(txtSensorSV);
 
-  uint32_t pjgIn = 0;
-  tPjg6.getValue(&pjgIn);
   pjgIn += 1;
-  tPjg6.setValue(pjgIn);
+  dtostrf(pjgIn, 10, 0, result);
+  tPjg6.setText(result);
 
   float nilaiIn = tinggi / pjgIn;
-  tPjgTing6.setValue(nilaiIn);
+  dtostrf(nilaiIn, 10, 2, result);;
+  tPjgTing6.setText(result);
   if (nilaiIn >= 1.2 && nilaiIn <= 2.4) {
     tPjgStat6.setText("L");
   } else {
@@ -1442,16 +1601,19 @@ void bAddPjgCB6(void *ptr) {
 }
 
 void bMinPjgCB6(void *ptr) {
-  uint32_t tinggi = 0;
-  tTinggi6.getValue(&tinggi);
+  memset(txtSensorSV, 0, sizeof txtSensorSV);   tTinggi6.getText(txtSensorSV, LentxtSensorSV);
+  float tinggi = atof(txtSensorSV);
+  memset(txtSensorSV, 0, sizeof txtSensorSV);   tPjg6.getText(txtSensorSV, LentxtSensorSV);
+  int pjgIn = atoi(txtSensorSV);
 
-  uint32_t pjgIn = 0;
-  tPjg6.getValue(&pjgIn);
   pjgIn -= 1;
-  tPjg6.setValue(pjgIn);
+  dtostrf(pjgIn, 10, 0, result);
+  tPjg6.setText(result);
 
   float nilaiIn = tinggi / pjgIn;
-  tPjgTing6.setValue(nilaiIn);
+  dtostrf(nilaiIn, 10, 2, result);;
+  tPjgTing6.setText(result);
+
   if (nilaiIn >= 1.2 && nilaiIn <= 2.4) {
     tPjgStat6.setText("L");
   } else {
@@ -1461,25 +1623,28 @@ void bMinPjgCB6(void *ptr) {
 
 //ukur HD Rat
 void bUkurHDCB6(void *ptr) {
-  uint32_t nilaiH = 0;
-  tTinggi6.getValue(&nilaiH);
-  uint32_t nilaiDim = 0;
-  tDim6.getValue(&nilaiDim);
+  memset(txtSensorSV, 0, sizeof txtSensorSV);   tTinggi6.getText(txtSensorSV, LentxtSensorSV);
+  float nilaiH = atof(txtSensorSV);
+  memset(txtSensorSV, 0, sizeof txtSensorSV);   tDim6.getText(txtSensorSV, LentxtSensorSV);
+  float nilaiDim = atof(txtSensorSV);
   float nilaiHD = (nilaiH * 10) / nilaiDim;
+
   if (nilaiHD <= 11) {
     tHdratStat6.setText("L");
   } else {
     tHdratStat6.setText("TL");
   }
-  tHdrat6.setValue(nilaiHD);
+  dtostrf(nilaiHD, 10, 2, result);
+  tHdrat6.setText(result);
 }
 
 //ukur jml daun
 void bAddDaunCB6(void *ptr) {
-  uint32_t daun = 0;
-  tJmlDaun6.getValue(&daun);
+  memset(txtSensorSV, 0, sizeof txtSensorSV);   tJmlDaun6.getText(txtSensorSV, LentxtSensorSV);
+  int daun = atoi(txtSensorSV);
   daun += 1;
-  tJmlDaun6.setValue(daun);
+  dtostrf(daun, 10, 0, result);
+  tJmlDaun6.setText(result);
   if (daun >= 5) {
     tJmlDaunStat6.setText("L");
   } else {
@@ -1488,10 +1653,11 @@ void bAddDaunCB6(void *ptr) {
 }
 
 void bMinDaunCB6(void *ptr) {
-  uint32_t daun = 0;
-  tJmlDaun6.getValue(&daun);
+  memset(txtSensorSV, 0, sizeof txtSensorSV);   tJmlDaun6.getText(txtSensorSV, LentxtSensorSV);
+  int daun = atoi(txtSensorSV);
   daun -= 1;
-  tJmlDaun6.setValue(daun);
+  dtostrf(daun, 10, 0, result);
+  tJmlDaun6.setText(result);
   if (daun >= 5) {
     tJmlDaunStat6.setText("L");
   } else {
@@ -1504,7 +1670,8 @@ void bUkurKelTanahCB6(void *ptr) {
   float nilai = (1023 - analogRead(SoilSensor));
   nilai = nilai / 1023;
   nilai = nilai * 100;
-  tKelTanah6.setValue(nilai);
+  dtostrf(nilai, 10, 2, result);
+  tKelTanah6.setText(result);
   if (nilai >= 66) {
     tKelTanahStat6.setText("Basah");
   } else if (nilai >= 31) {
@@ -1517,42 +1684,48 @@ void bUkurKelTanahCB6(void *ptr) {
 void bAnalisaCB6(void *ptr) {
   int L = 0;
   int TL = 0;
-  uint32_t tinggi = 0;
-  uint32_t diameter = 0;
-  uint32_t panjang = 0;
-  uint32_t hdrat = 0;
-  uint32_t daun = 0;
 
-  tTinggi6.getValue(&tinggi);
-  if (tinggi >= 30 && tinggi <= 50) {
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tTingStat6.getText(txtSensorSV, LentxtSensorSV);
+  String tTingStat = txtSensorSV;
+
+  if (tTingStat == "L") {
     L += 1;
   } else {
     TL += 1;
   }
 
-  tDim6.getValue(&diameter);
-  if (diameter >= 2.3) {
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tDimStat6.getText(txtSensorSV, LentxtSensorSV);
+  String tDimStat = txtSensorSV;
+  if (tDimStat == "L") {
     L += 1;
   } else {
     TL += 1;
   }
 
-  tPjgTing6.getValue(&panjang);
-  if (panjang >= 1.2 && panjang <= 2.4) {
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tPjgStat6.getText(txtSensorSV, LentxtSensorSV);
+  String tPjgStat = txtSensorSV;
+  if (tPjgStat == "L") {
     L += 1;
   } else {
     TL += 1;
   }
 
-  tHdrat6.getValue(&hdrat);
-  if (hdrat <= 11) {
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tHdratStat6.getText(txtSensorSV, LentxtSensorSV);
+  String tHdratStat = txtSensorSV;
+  if (tHdratStat == "L") {
     L += 1;
   } else {
     TL += 1;
   }
 
-  tJmlDaun6.getValue(&daun);
-  if (daun >= 5) {
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tJmlDaunStat6.getText(txtSensorSV, LentxtSensorSV);
+  String tJmlDaunStat = txtSensorSV;
+  if (tJmlDaunStat == "L") {
     L += 1;
   } else {
     TL += 1;
@@ -1573,39 +1746,46 @@ void bSimpanCB6(void *ptr) {
 //EP0361WK PP
 //ukur tinggi
 void bUkurTinggiCB7(void *ptr) {
-  float nilai = sensor.readRangeContinuousMillimeters() / 10;
+  float nilai = (float)sensor.readRangeContinuousMillimeters() / 10;
   if (nilai >= 35 && nilai <= 55) {
     tTingStat7.setText("L");
   } else {
     tTingStat7.setText("TL");
   }
-  tTinggi7.setValue(nilai);
+  char tinggi[10];
+  dtostrf(nilai, 10, 2, tinggi);
+  tTinggi7.setText(tinggi);
 }
 
 //ukur diameter
 void bUkurDimCB7(void *ptr) {
-  float nilai = sensor.readRangeContinuousMillimeters();
-  nilai = nilai - 30;
+  float nilai = (float)sensor.readRangeContinuousMillimeters() - batasBawah;
+
   if (nilai >= 3) {
     tDimStat7.setText("L");
   } else {
     tDimStat7.setText("TL");
   }
-  tDim7.setValue(nilai);
+  char dim[10];
+  dtostrf(nilai, 10, 2, dim);
+  tDim7.setText(dim);
 }
 
 //ukur pjg internode
 void bAddPjgCB7(void *ptr) {
-  uint32_t tinggi = 0;
-  tTinggi7.getValue(&tinggi);
+  memset(txtSensorSV, 0, sizeof txtSensorSV);   tTinggi7.getText(txtSensorSV, LentxtSensorSV);
+  float tinggi = atof(txtSensorSV);
+  memset(txtSensorSV, 0, sizeof txtSensorSV);   tPjg7.getText(txtSensorSV, LentxtSensorSV);
+  int pjgIn = atoi(txtSensorSV);
 
-  uint32_t pjgIn = 0;
-  tPjg7.getValue(&pjgIn);
   pjgIn += 1;
-  tPjg7.setValue(pjgIn);
+  dtostrf(pjgIn, 10, 0, result);
+  tPjg7.setText(result);
 
   float nilaiIn = tinggi / pjgIn;
-  tPjgTing7.setValue(nilaiIn);
+  dtostrf(nilaiIn, 10, 2, result);
+
+  tPjgTing7.setText(result);
   if (nilaiIn >= 1.2 && nilaiIn <= 2.5) {
     tPjgStat7.setText("L");
   } else {
@@ -1614,16 +1794,18 @@ void bAddPjgCB7(void *ptr) {
 }
 
 void bMinPjgCB7(void *ptr) {
-  uint32_t tinggi = 0;
-  tTinggi7.getValue(&tinggi);
+  memset(txtSensorSV, 0, sizeof txtSensorSV);   tTinggi7.getText(txtSensorSV, LentxtSensorSV);
+  float tinggi = atof(txtSensorSV);
+  memset(txtSensorSV, 0, sizeof txtSensorSV);   tPjg7.getText(txtSensorSV, LentxtSensorSV);
+  int pjgIn = atoi(txtSensorSV);
 
-  uint32_t pjgIn = 0;
-  tPjg7.getValue(&pjgIn);
   pjgIn -= 1;
-  tPjg7.setValue(pjgIn);
+  dtostrf(pjgIn, 10, 0, result);
+  tPjg7.setText(result);
 
   float nilaiIn = tinggi / pjgIn;
-  tPjgTing7.setValue(nilaiIn);
+  dtostrf(nilaiIn, 10, 2, result);
+  tPjgTing7.setText(result);
   if (nilaiIn >= 1.2 && nilaiIn <= 2.5) {
     tPjgStat7.setText("L");
   } else {
@@ -1633,25 +1815,28 @@ void bMinPjgCB7(void *ptr) {
 
 //ukur HD Rat
 void bUkurHDCB7(void *ptr) {
-  uint32_t nilaiH = 0;
-  tTinggi7.getValue(&nilaiH);
-  uint32_t nilaiDim = 0;
-  tDim7.getValue(&nilaiDim);
+  memset(txtSensorSV, 0, sizeof txtSensorSV);   tTinggi7.getText(txtSensorSV, LentxtSensorSV);
+  float nilaiH = atof(txtSensorSV);
+  memset(txtSensorSV, 0, sizeof txtSensorSV);   tDim7.getText(txtSensorSV, LentxtSensorSV);
+  float nilaiDim = atof(txtSensorSV);
   float nilaiHD = (nilaiH * 10) / nilaiDim;
+
   if (nilaiHD <= 12) {
     tHdratStat7.setText("L");
   } else {
     tHdratStat7.setText("TL");
   }
-  tHdrat7.setValue(nilaiHD);
+  dtostrf(nilaiHD, 10, 2, result);
+  tHdrat7.setText(result);
 }
 
 //ukur jml daun
 void bAddDaunCB7(void *ptr) {
-  uint32_t daun = 0;
-  tJmlDaun7.getValue(&daun);
+  memset(txtSensorSV, 0, sizeof txtSensorSV);   tJmlDaun7.getText(txtSensorSV, LentxtSensorSV);
+  int daun = atoi(txtSensorSV);
   daun += 1;
-  tJmlDaun7.setValue(daun);
+  dtostrf(daun, 10, 0, result);
+  tJmlDaun7.setText(result);
   if (daun >= 5) {
     tJmlDaunStat7.setText("L");
   } else {
@@ -1660,10 +1845,11 @@ void bAddDaunCB7(void *ptr) {
 }
 
 void bMinDaunCB7(void *ptr) {
-  uint32_t daun = 0;
-  tJmlDaun7.getValue(&daun);
+  memset(txtSensorSV, 0, sizeof txtSensorSV);   tJmlDaun7.getText(txtSensorSV, LentxtSensorSV);
+  int daun = atoi(txtSensorSV);
   daun -= 1;
-  tJmlDaun7.setValue(daun);
+  dtostrf(daun, 10, 0, result);
+  tJmlDaun7.setText(result);
   if (daun >= 5) {
     tJmlDaunStat7.setText("L");
   } else {
@@ -1676,7 +1862,8 @@ void bUkurKelTanahCB7(void *ptr) {
   float nilai = (1023 - analogRead(SoilSensor));
   nilai = nilai / 1023;
   nilai = nilai * 100;
-  tKelTanah7.setValue(nilai);
+  dtostrf(nilai, 10, 2, result);
+  tKelTanah7.setText(result);
   if (nilai >= 66) {
     tKelTanahStat7.setText("Basah");
   } else if (nilai >= 31) {
@@ -1689,42 +1876,48 @@ void bUkurKelTanahCB7(void *ptr) {
 void bAnalisaCB7(void *ptr) {
   int L = 0;
   int TL = 0;
-  uint32_t tinggi = 0;
-  uint32_t diameter = 0;
-  uint32_t panjang = 0;
-  uint32_t hdrat = 0;
-  uint32_t daun = 0;
 
-  tTinggi7.getValue(&tinggi);
-  if (tinggi >= 35 && tinggi <= 55) {
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tTingStat7.getText(txtSensorSV, LentxtSensorSV);
+  String tTingStat = txtSensorSV;
+
+  if (tTingStat == "L") {
     L += 1;
   } else {
     TL += 1;
   }
 
-  tDim7.getValue(&diameter);
-  if (diameter >= 3) {
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tDimStat7.getText(txtSensorSV, LentxtSensorSV);
+  String tDimStat = txtSensorSV;
+  if (tDimStat == "L") {
     L += 1;
   } else {
     TL += 1;
   }
 
-  tPjgTing7.getValue(&panjang);
-  if (panjang >= 1.2 && panjang <= 2.5) {
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tPjgStat7.getText(txtSensorSV, LentxtSensorSV);
+  String tPjgStat = txtSensorSV;
+  if (tPjgStat == "L") {
     L += 1;
   } else {
     TL += 1;
   }
 
-  tHdrat7.getValue(&hdrat);
-  if (hdrat <= 12) {
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tHdratStat7.getText(txtSensorSV, LentxtSensorSV);
+  String tHdratStat = txtSensorSV;
+  if (tHdratStat == "L") {
     L += 1;
   } else {
     TL += 1;
   }
 
-  tJmlDaun7.getValue(&daun);
-  if (daun >= 5) {
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tJmlDaunStat7.getText(txtSensorSV, LentxtSensorSV);
+  String tJmlDaunStat = txtSensorSV;
+  if (tJmlDaunStat == "L") {
     L += 1;
   } else {
     TL += 1;
@@ -1745,39 +1938,45 @@ void bSimpanCB7(void *ptr) {
 //CLONE PP
 //ukur tinggi
 void bUkurTinggiCB8(void *ptr) {
-  float nilai = sensor.readRangeContinuousMillimeters() / 10;
+  float nilai = (float)sensor.readRangeContinuousMillimeters() / 10;
   if (nilai >= 30 && nilai <= 55) {
     tTingStat8.setText("L");
   } else {
     tTingStat8.setText("TL");
   }
-  tTinggi8.setValue(nilai);
+  char tinggi[10];
+  dtostrf(nilai, 10, 2, tinggi);
+  tTinggi8.setText(tinggi);
 }
 
 //ukur diameter
 void bUkurDimCB8(void *ptr) {
-  float nilai = sensor.readRangeContinuousMillimeters();
-  nilai = nilai - 30;
+  float nilai = (float)sensor.readRangeContinuousMillimeters() - batasBawah;
+
   if (nilai >= 2.3) {
     tDimStat8.setText("L");
   } else {
     tDimStat8.setText("TL");
   }
-  tDim8.setValue(nilai);
+  char dim[10];
+  dtostrf(nilai, 10, 2, dim);
+  tDim8.setText(dim);
 }
 
 //ukur pjg internode
 void bAddPjgCB8(void *ptr) {
-  uint32_t tinggi = 0;
-  tTinggi8.getValue(&tinggi);
+  memset(txtSensorSV, 0, sizeof txtSensorSV);   tTinggi8.getText(txtSensorSV, LentxtSensorSV);
+  float tinggi = atof(txtSensorSV);
+  memset(txtSensorSV, 0, sizeof txtSensorSV);   tPjg8.getText(txtSensorSV, LentxtSensorSV);
+  int pjgIn = atoi(txtSensorSV);
 
-  uint32_t pjgIn = 0;
-  tPjg8.getValue(&pjgIn);
   pjgIn += 1;
-  tPjg8.setValue(pjgIn);
+  dtostrf(pjgIn, 10, 0, result);
+  tPjg8.setText(result);
 
   float nilaiIn = tinggi / pjgIn;
-  tPjgTing8.setValue(nilaiIn);
+  dtostrf(nilaiIn, 10, 2, result);;
+  tPjgTing8.setText(result);
   if (nilaiIn >= 1.5 && nilaiIn <= 2.3) {
     tPjgStat8.setText("L");
   } else {
@@ -1786,16 +1985,18 @@ void bAddPjgCB8(void *ptr) {
 }
 
 void bMinPjgCB8(void *ptr) {
-  uint32_t tinggi = 0;
-  tTinggi8.getValue(&tinggi);
+  memset(txtSensorSV, 0, sizeof txtSensorSV);   tTinggi8.getText(txtSensorSV, LentxtSensorSV);
+  float tinggi = atof(txtSensorSV);
+  memset(txtSensorSV, 0, sizeof txtSensorSV);   tPjg8.getText(txtSensorSV, LentxtSensorSV);
+  int pjgIn = atoi(txtSensorSV);
 
-  uint32_t pjgIn = 0;
-  tPjg8.getValue(&pjgIn);
   pjgIn -= 1;
-  tPjg8.setValue(pjgIn);
+  dtostrf(pjgIn, 10, 0, result);
+  tPjg8.setText(result);
 
   float nilaiIn = tinggi / pjgIn;
-  tPjgTing8.setValue(nilaiIn);
+  dtostrf(nilaiIn, 10, 2, result);
+  tPjgTing8.setText(result);
   if (nilaiIn >= 1.5 && nilaiIn <= 2.3) {
     tPjgStat8.setText("L");
   } else {
@@ -1805,25 +2006,30 @@ void bMinPjgCB8(void *ptr) {
 
 //ukur HD Rat
 void bUkurHDCB8(void *ptr) {
-  uint32_t nilaiH = 0;
-  tTinggi8.getValue(&nilaiH);
-  uint32_t nilaiDim = 0;
-  tDim8.getValue(&nilaiDim);
+  memset(txtSensorSV, 0, sizeof txtSensorSV);   tTinggi8.getText(txtSensorSV, LentxtSensorSV);
+  float nilaiH = atof(txtSensorSV);
+  memset(txtSensorSV, 0, sizeof txtSensorSV);   tDim8.getText(txtSensorSV, LentxtSensorSV);
+  float nilaiDim = atof(txtSensorSV);
   float nilaiHD = (nilaiH * 10) / nilaiDim;
+
+  dtostrf(nilaiHD, 10, 2, result);
+
   if (nilaiHD <= 11) {
     tHdratStat8.setText("L");
   } else {
     tHdratStat8.setText("TL");
   }
-  tHdrat8.setValue(nilaiHD);
+  tHdrat8.setText(result);
 }
 
 //ukur jml daun
 void bAddDaunCB8(void *ptr) {
-  uint32_t daun = 0;
-  tJmlDaun8.getValue(&daun);
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tJmlDaun8.getText(txtSensorSV, LentxtSensorSV);
+  int daun = atoi(txtSensorSV);
   daun += 1;
-  tJmlDaun8.setValue(daun);
+  dtostrf(daun, 10, 0, result);
+  tJmlDaun8.setText(result);
   if (daun >= 5) {
     tJmlDaunStat8.setText("L");
   } else {
@@ -1832,10 +2038,11 @@ void bAddDaunCB8(void *ptr) {
 }
 
 void bMinDaunCB8(void *ptr) {
-  uint32_t daun = 0;
-  tJmlDaun8.getValue(&daun);
+  memset(txtSensorSV, 0, sizeof txtSensorSV);   tJmlDaun8.getText(txtSensorSV, LentxtSensorSV);
+  int daun = atoi(txtSensorSV);
   daun -= 1;
-  tJmlDaun8.setValue(daun);
+  dtostrf(daun, 10, 0, result);
+  tJmlDaun8.setText(result);
   if (daun >= 5) {
     tJmlDaunStat8.setText("L");
   } else {
@@ -1848,7 +2055,8 @@ void bUkurKelTanahCB8(void *ptr) {
   float nilai = (1023 - analogRead(SoilSensor));
   nilai = nilai / 1023;
   nilai = nilai * 100;
-  tKelTanah8.setValue(nilai);
+  dtostrf(nilai, 10, 2, result);
+  tKelTanah8.setText(result);
   if (nilai >= 66) {
     tKelTanahStat8.setText("Basah");
   } else if (nilai >= 31) {
@@ -1861,42 +2069,48 @@ void bUkurKelTanahCB8(void *ptr) {
 void bAnalisaCB8(void *ptr) {
   int L = 0;
   int TL = 0;
-  uint32_t tinggi = 0;
-  uint32_t diameter = 0;
-  uint32_t panjang = 0;
-  uint32_t hdrat = 0;
-  uint32_t daun = 0;
 
-  tTinggi8.getValue(&tinggi);
-  if (tinggi >= 30 && tinggi <= 55) {
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tTingStat8.getText(txtSensorSV, LentxtSensorSV);
+  String tTingStat = txtSensorSV;
+
+  if (tTingStat == "L") {
     L += 1;
   } else {
     TL += 1;
   }
 
-  tDim8.getValue(&diameter);
-  if (diameter >= 3) {
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tDimStat8.getText(txtSensorSV, LentxtSensorSV);
+  String tDimStat = txtSensorSV;
+  if (tDimStat == "L") {
     L += 1;
   } else {
     TL += 1;
   }
 
-  tPjgTing8.getValue(&panjang);
-  if (panjang >= 1.5 && panjang <= 2.3) {
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tPjgStat8.getText(txtSensorSV, LentxtSensorSV);
+  String tPjgStat = txtSensorSV;
+  if (tPjgStat == "L") {
     L += 1;
   } else {
     TL += 1;
   }
 
-  tHdrat8.getValue(&hdrat);
-  if (hdrat <= 11) {
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tHdratStat8.getText(txtSensorSV, LentxtSensorSV);
+  String tHdratStat = txtSensorSV;
+  if (tHdratStat == "L") {
     L += 1;
   } else {
     TL += 1;
   }
 
-  tJmlDaun8.getValue(&daun);
-  if (daun >= 5) {
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tJmlDaunStat8.getText(txtSensorSV, LentxtSensorSV);
+  String tJmlDaunStat = txtSensorSV;
+  if (tJmlDaunStat == "L") {
     L += 1;
   } else {
     TL += 1;
@@ -1913,3 +2127,66 @@ void bSimpanCB8(void *ptr) {
 
 }
 //End Of CLONE PP
+
+//SELEKSI
+void bSimpanCB9(void *ptr) {
+  float nilai = (float)sensor.readRangeContinuousMillimeters() - batasBawah;
+  nilai = nilai / 10;
+
+  if (nilai >= 25) {
+    tGrade9.setText("A");
+  } else if (nilai >= 20) {
+    tGrade9.setText("B");
+  } else {
+    tGrade9.setText("C");
+  }
+  char dim[10];
+  dtostrf(nilai, 10, 2, dim);
+  tTinggi9.setText(dim);
+}
+//END OF SELEKSI
+
+//DIAMETER
+void bSimpanCB10(void *ptr) {
+
+}
+//END OF DIAMETER
+
+void decode() {
+  int sign = 1;
+  int i = 0;
+  float value = 0.0;
+  float result = 0.0;
+
+  bit_array[i] = digitalRead(DATA_PIN);       // Store the 1st bit (start bit) which is always 1.
+  while (digitalRead(CLOCK_PIN) == HIGH) {};
+
+  for (i = 1; i <= 24; i++) {
+    while (digitalRead(CLOCK_PIN) == LOW) { } // Wait until clock returns to HIGH
+    bit_array[i] = digitalRead(DATA_PIN);
+    while (digitalRead(CLOCK_PIN) == HIGH) {} // Wait until clock returns to LOW
+  }
+
+  for (i = 0; i <= 24; i++) {                 // Show the content of the bit array. This is for verification only.
+    Serial.print(bit_array[i]);
+    Serial.print(" ");
+  }
+  Serial.println();
+
+  for (i = 1; i <= 20; i++) {                 // Turning the value in the bit array from binary to decimal.
+    value = value + (pow(2, i - 1) * bit_array[i]);
+  }
+
+  if (bit_array[21] == 1) sign = -1;          // Bit 21 is the sign bit. 0 -> +, 1 => -
+
+  if (bit_array[24] == 1) {                   // Bit 24 tells the measuring unit (1 -> in, 0 -> mm)
+    result = (value * sign) / 2000.00;
+    Serial.print(result, 3);                  // Print result with 3 decimals
+    Serial.println(" in");
+  } else {
+    result = (value * sign) / 100.00;
+    Serial.print(result, 2);                  // Print result with 2 decimals
+    Serial.println(" mm");
+  }
+  delay(1000);
+}
