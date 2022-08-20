@@ -345,6 +345,7 @@ NexText tLulus8 = NexText(9, 13, "tLulus");
 //End OF CLONE PP
 
 //SELEKSI
+NexButton bUkur9 = NexButton(11, 8, "bUkur");
 //Tinggi
 NexText tTinggi9 = NexText(11, 5, "tTinggi");
 //Grade
@@ -354,6 +355,7 @@ NexButton bSimpan9 = NexButton(11, 3, "bSimpan");
 //End OF SELEKSI
 
 //UKUR DIAMETER
+NexButton bUkur10 = NexButton(12, 8, "bUkur");
 //Diameter
 NexText tDim10 = NexText(12, 5, "tDim");
 //Simpan data
@@ -455,9 +457,11 @@ NexTouch *nex_listen_list[] = {
   &tTinggi9,
   &tGrade9,
   &bSimpan9,
+  &bUkur9,
   //DIAMETER
   &tDim10,
   &bSimpan10,
+  &bUkur10,
   NULL
 };
 
@@ -567,20 +571,22 @@ void setup()
   bSimpan8.attachPop(bSimpanCB8, &bSimpan8);
 
   //SELEKSI
+  bUkur9.attachPop(bUkurCB9, &bUkur9);
   bSimpan9.attachPop(bSimpanCB9, &bSimpan9);
 
   //DIAMETER
+  bUkur10.attachPop(bUkurCB10, &bUkur10);
   bSimpan10.attachPop(bSimpanCB10, &bSimpan10);
 
   dbSerialPrintln("setup done");
 
-  sensor.setTimeout(500);
-  //  if (!sensor.init())
-  //  {
-  //    Serial.println("Failed to detect and initialize sensor!");
-  //    while (1) {}
-  //  }
-  //  sensor.startContinuous();
+ sensor.setTimeout(500);
+  if (!sensor.init())
+  {
+    Serial.println("Failed to detect and initialize sensor!");
+    while (1) {}
+  }
+  sensor.startContinuous();
   pinMode(SoilSensor, INPUT);
 }
 
@@ -2129,7 +2135,7 @@ void bSimpanCB8(void *ptr) {
 //End Of CLONE PP
 
 //SELEKSI
-void bSimpanCB9(void *ptr) {
+void bUkurCB9(void *ptr) {
   float nilai = (float)sensor.readRangeContinuousMillimeters() - batasBawah;
   nilai = nilai / 10;
 
@@ -2144,9 +2150,16 @@ void bSimpanCB9(void *ptr) {
   dtostrf(nilai, 10, 2, dim);
   tTinggi9.setText(dim);
 }
+
+void bSimpanCB9(void *ptr) {
+
+}
 //END OF SELEKSI
 
 //DIAMETER
+void bUkurCB10(void *ptr) {
+
+}
 void bSimpanCB10(void *ptr) {
 
 }
