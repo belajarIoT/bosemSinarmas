@@ -13,7 +13,7 @@ unsigned long time_now;
 char txSensorSV[10] = {'0'};
 char result[10] = {0};
 
-float batasBawah = 50;
+float batasBawah = 30;
 // Pin Declarations
 int DATA_PIN = 4;
 int CLOCK_PIN = 5;
@@ -355,7 +355,7 @@ NexButton bSimpan9 = NexButton(11, 3, "bSimpan");
 //End OF SELEKSI
 
 //UKUR DIAMETER
-NexButton bUkur10 = NexButton(12, 8, "bUkur");
+NexButton bUkur10 = NexButton(12, 6, "bUkur");
 //Diameter
 NexText tDim10 = NexText(12, 5, "tDim");
 //Simpan data
@@ -580,7 +580,7 @@ void setup()
 
   dbSerialPrintln("setup done");
 
- sensor.setTimeout(500);
+  sensor.setTimeout(500);
   if (!sensor.init())
   {
     Serial.println("Failed to detect and initialize sensor!");
@@ -592,13 +592,13 @@ void setup()
 
 void loop(void)
 {
-  nexLoop(nex_listen_list);
   //  while (digitalRead(CLOCK_PIN) == LOW) {}  // If clock is LOW wait until it turns to HIGH
   //  time_now = micros();
   //  while (digitalRead(CLOCK_PIN) == HIGH) {} // Wait for the end of the HIGH pulse
   //  if ((micros() - time_now) > 500) {        // If the HIGH pulse was longer than 500 micros we are at the start of a new bit sequence
   //    decode(); //decode the bit sequence
   //  }
+  nexLoop(nex_listen_list);
 }
 
 //Acra Seddling
@@ -617,16 +617,7 @@ void bUkurTinggiCB(void *ptr) {
 
 //ukur diameter
 void bUkurDimCB(void *ptr) {
-  float nilai = (float)sensor.readRangeContinuousMillimeters() - batasBawah;
-
-  if (nilai >= 3) {
-    tDimStat.setText("L");
-  } else {
-    tDimStat.setText("TL");
-  }
-  char dim[10];
-  dtostrf(nilai, 10, 2, dim);
-  tDim.setText(dim);
+  decode(3, 0);
 }
 
 //ukur pjg internode
@@ -809,16 +800,7 @@ void bUkurTinggiCB2(void *ptr) {
 
 //ukur diameter
 void bUkurDimCB2(void *ptr) {
-  float nilai = (float)sensor.readRangeContinuousMillimeters() - batasBawah;
-
-  if (nilai >= 3) {
-    tDimStat2.setText("L");
-  } else {
-    tDimStat2.setText("TL");
-  }
-  char dim[10];
-  dtostrf(nilai, 10, 2, dim);
-  tDim2.setText(dim);
+  decode(3, 2);
 }
 
 //ukur pjg internode
@@ -1000,16 +982,7 @@ void bUkurTinggiCB3(void *ptr) {
 
 //ukur diameter
 void bUkurDimCB3(void *ptr) {
-  float nilai = (float)sensor.readRangeContinuousMillimeters() - batasBawah;
-
-  if (nilai >= 2.2) {
-    tDimStat3.setText("L");
-  } else {
-    tDimStat3.setText("TL");
-  }
-  char dim[10];
-  dtostrf(nilai, 10, 2, dim);
-  tDim3.setText(dim);
+  decode(2.2, 3);
 }
 
 //ukur pjg internode
@@ -1191,16 +1164,7 @@ void bUkurTinggiCB4(void *ptr) {
 
 //ukur diameter
 void bUkurDimCB4(void *ptr) {
-  float nilai = (float)sensor.readRangeContinuousMillimeters() - batasBawah;
-
-  if (nilai >= 2.7) {
-    tDimStat4.setText("L");
-  } else {
-    tDimStat4.setText("TL");
-  }
-  char dim[10];
-  dtostrf(nilai, 10, 2, dim);
-  tDim4.setText(dim);
+  decode(2.7, 4);
 }
 
 //ukur pjg internode
@@ -1382,16 +1346,7 @@ void bUkurTinggiCB5(void *ptr) {
 
 //ukur diameter
 void bUkurDimCB5(void *ptr) {
-  float nilai = (float)sensor.readRangeContinuousMillimeters() - batasBawah;
-
-  if (nilai >= 2.2) {
-    tDimStat5.setText("L");
-  } else {
-    tDimStat5.setText("TL");
-  }
-  char dim[10];
-  dtostrf(nilai, 10, 2, dim);
-  tDim5.setText(dim);
+  decode(2.2, 5);
 }
 
 //ukur pjg internode
@@ -1573,16 +1528,7 @@ void bUkurTinggiCB6(void *ptr) {
 
 //ukur diameter
 void bUkurDimCB6(void *ptr) {
-  float nilai = (float)sensor.readRangeContinuousMillimeters() - batasBawah;
-
-  if (nilai >= 2.3) {
-    tDimStat6.setText("L");
-  } else {
-    tDimStat6.setText("TL");
-  }
-  char dim[10];
-  dtostrf(nilai, 10, 2, dim);
-  tDim6.setText(dim);
+  decode(2.3, 6);
 }
 
 //ukur pjg internode
@@ -1765,16 +1711,7 @@ void bUkurTinggiCB7(void *ptr) {
 
 //ukur diameter
 void bUkurDimCB7(void *ptr) {
-  float nilai = (float)sensor.readRangeContinuousMillimeters() - batasBawah;
-
-  if (nilai >= 3) {
-    tDimStat7.setText("L");
-  } else {
-    tDimStat7.setText("TL");
-  }
-  char dim[10];
-  dtostrf(nilai, 10, 2, dim);
-  tDim7.setText(dim);
+  decode(3, 7);
 }
 
 //ukur pjg internode
@@ -1957,16 +1894,7 @@ void bUkurTinggiCB8(void *ptr) {
 
 //ukur diameter
 void bUkurDimCB8(void *ptr) {
-  float nilai = (float)sensor.readRangeContinuousMillimeters() - batasBawah;
-
-  if (nilai >= 2.3) {
-    tDimStat8.setText("L");
-  } else {
-    tDimStat8.setText("TL");
-  }
-  char dim[10];
-  dtostrf(nilai, 10, 2, dim);
-  tDim8.setText(dim);
+  decode(2.3, 8);
 }
 
 //ukur pjg internode
@@ -2158,14 +2086,15 @@ void bSimpanCB9(void *ptr) {
 
 //DIAMETER
 void bUkurCB10(void *ptr) {
-
+  decode(0,10);
 }
+
 void bSimpanCB10(void *ptr) {
 
 }
 //END OF DIAMETER
 
-void decode() {
+void decode(float batas, int stat) {
   int sign = 1;
   int i = 0;
   float value = 0.0;
@@ -2201,5 +2130,66 @@ void decode() {
     Serial.print(result, 2);                  // Print result with 2 decimals
     Serial.println(" mm");
   }
-  delay(1000);
+
+  float nilai = result;
+
+  if (nilai >= batas) {
+    if (stat == 0) {
+      tDimStat.setText("L");
+    } else if (stat == 2) {
+      tDimStat2.setText("L");
+    } else if (stat == 3) {
+      tDimStat3.setText("L");
+    } else if (stat == 4) {
+      tDimStat4.setText("L");
+    } else if (stat == 5) {
+      tDimStat5.setText("L");
+    } else if (stat == 6) {
+      tDimStat6.setText("L");
+    } else if (stat == 7) {
+      tDimStat7.setText("L");
+    } else if (stat == 8) {
+      tDimStat8.setText("L");
+    }
+  } else {
+    if (stat == 0) {
+      tDimStat.setText("TL");
+    } else if (stat == 2) {
+      tDimStat2.setText("TL");
+    } else if (stat == 3) {
+      tDimStat3.setText("TL");
+    } else if (stat == 4) {
+      tDimStat4.setText("TL");
+    } else if (stat == 5) {
+      tDimStat5.setText("TL");
+    } else if (stat == 6) {
+      tDimStat6.setText("TL");
+    } else if (stat == 7) {
+      tDimStat7.setText("TL");
+    } else if (stat == 8) {
+      tDimStat8.setText("TL");
+    }
+  }
+  char dim[10];
+  dtostrf(nilai, 10, 2, dim);
+    if (stat == 0) {
+      tDim.setText(dim);
+    } else if (stat == 2) {
+      tDim2.setText(dim);
+    } else if (stat == 3) {
+      tDim3.setText(dim);
+    } else if (stat == 4) {
+      tDim4.setText(dim);
+    } else if (stat == 5) {
+      tDim5.setText(dim);
+    } else if (stat == 6) {
+      tDim6.setText(dim);
+    } else if (stat == 7) {
+      tDim7.setText(dim);
+    } else if (stat == 8) {
+      tDim8.setText(dim);
+    } else if (stat == 10) {
+      tDim10.setText(dim);
+    }
+
 }
