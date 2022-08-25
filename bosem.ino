@@ -1,6 +1,9 @@
 #include <Nextion.h>
 #include <Wire.h>
 #include <VL53L0X.h>
+#include <SPI.h>
+#include <SD.h>
+File myFile;
 VL53L0X sensor;
 const int SoilSensor = A0;
 
@@ -29,6 +32,18 @@ int out = 0;
 NexText tTinggi = NexText(2, 31, "tTinggi");
 NexText tTingStat = NexText(2, 14, "tTingStat");
 NexButton bUkurTinggi = NexButton(2, 19, "bUkurTinggi");
+
+//RTC NEXTION
+NexText tClock = NexText(2, 38, "t11");
+NexText tClock2 = NexText(3, 38, "t11");
+NexText tClock3 = NexText(4, 38, "t11");
+NexText tClock4 = NexText(5, 38, "t11");
+NexText tClock5 = NexText(6, 38, "t11");
+NexText tClock6 = NexText(7, 38, "t11");
+NexText tClock7 = NexText(8, 37, "t11");
+NexText tClock8 = NexText(9, 38, "t11");
+NexText tClock9 = NexText(11, 12, "t3");
+NexText tClock10 = NexText(12, 7, "t3");
 
 //Diameter
 NexText tDim = NexText(2, 32, "tDim");
@@ -586,18 +601,17 @@ void setup()
     Serial.println("Failed to detect and initialize sensor!");
     while (1) {}
   }
+
+  if (!SD.begin(53)) {
+    Serial.println("initialization failed!");
+    while (1);
+  }
   sensor.startContinuous();
   pinMode(SoilSensor, INPUT);
 }
 
 void loop(void)
 {
-  //  while (digitalRead(CLOCK_PIN) == LOW) {}  // If clock is LOW wait until it turns to HIGH
-  //  time_now = micros();
-  //  while (digitalRead(CLOCK_PIN) == HIGH) {} // Wait for the end of the HIGH pulse
-  //  if ((micros() - time_now) > 500) {        // If the HIGH pulse was longer than 500 micros we are at the start of a new bit sequence
-  //    decode(); //decode the bit sequence
-  //  }
   nexLoop(nex_listen_list);
 }
 
@@ -2080,17 +2094,60 @@ void bUkurCB9(void *ptr) {
 }
 
 void bSimpanCB9(void *ptr) {
+  //GET VALUE FROM LCD
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tTinggi9.getText(txtSensorSV, LentxtSensorSV);
+  String tTinggi9 = txtSensorSV;
 
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tGrade9.getText(txtSensorSV, LentxtSensorSV);
+  String tGrade9 = txtSensorSV;
+
+  SD.exists("DatSel.csv");
+
+  //OPEN FILE
+  myFile = SD.open("DatSel.csv", FILE_WRITE);
+  if (myFile) {
+    myFile.print(',');
+    myFile.print(tTinggi9);
+    myFile.print(',');
+    myFile.print(tGrade9);
+    myFile.print(',');
+    myFile.println("");
+    myFile.close();
+    Serial.println("Success write data");
+  } else {
+    // if the file didn't open, print an error:
+    Serial.println("error opening DatSel.csv");
+  }
 }
 //END OF SELEKSI
 
 //DIAMETER
 void bUkurCB10(void *ptr) {
-  decode(0,10);
+  decode(0, 10);
 }
 
 void bSimpanCB10(void *ptr) {
+  //GET VALUE FROM LCD
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tDim.getText(txtSensorSV, LentxtSensorSV);
+  String tDim = txtSensorSV;
+  SD.exists("DatDim.csv");
 
+  //OPEN FILE
+  myFile = SD.open("DatDim.csv", FILE_WRITE);
+  if (myFile) {
+    myFile.print(',');
+    myFile.print(tDim);
+    myFile.print(',');
+    myFile.println("");
+    myFile.close();
+    Serial.println("Success write data");
+  } else {
+    // if the file didn't open, print an error:
+    Serial.println("error opening DatDim.csv");
+  }
 }
 //END OF DIAMETER
 
@@ -2172,24 +2229,24 @@ void decode(float batas, int stat) {
   }
   char dim[10];
   dtostrf(nilai, 10, 2, dim);
-    if (stat == 0) {
-      tDim.setText(dim);
-    } else if (stat == 2) {
-      tDim2.setText(dim);
-    } else if (stat == 3) {
-      tDim3.setText(dim);
-    } else if (stat == 4) {
-      tDim4.setText(dim);
-    } else if (stat == 5) {
-      tDim5.setText(dim);
-    } else if (stat == 6) {
-      tDim6.setText(dim);
-    } else if (stat == 7) {
-      tDim7.setText(dim);
-    } else if (stat == 8) {
-      tDim8.setText(dim);
-    } else if (stat == 10) {
-      tDim10.setText(dim);
-    }
+  if (stat == 0) {
+    tDim.setText(dim);
+  } else if (stat == 2) {
+    tDim2.setText(dim);
+  } else if (stat == 3) {
+    tDim3.setText(dim);
+  } else if (stat == 4) {
+    tDim4.setText(dim);
+  } else if (stat == 5) {
+    tDim5.setText(dim);
+  } else if (stat == 6) {
+    tDim6.setText(dim);
+  } else if (stat == 7) {
+    tDim7.setText(dim);
+  } else if (stat == 8) {
+    tDim8.setText(dim);
+  } else if (stat == 10) {
+    tDim10.setText(dim);
+  }
 
 }
