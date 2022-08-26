@@ -34,16 +34,6 @@ NexText tTingStat = NexText(2, 14, "tTingStat");
 NexButton bUkurTinggi = NexButton(2, 19, "bUkurTinggi");
 
 //RTC NEXTION
-NexText tClock = NexText(2, 38, "t11");
-NexText tClock2 = NexText(3, 38, "t11");
-NexText tClock3 = NexText(4, 38, "t11");
-NexText tClock4 = NexText(5, 38, "t11");
-NexText tClock5 = NexText(6, 38, "t11");
-NexText tClock6 = NexText(7, 38, "t11");
-NexText tClock7 = NexText(8, 37, "t11");
-NexText tClock8 = NexText(9, 38, "t11");
-NexText tClock9 = NexText(11, 12, "t3");
-NexText tClock10 = NexText(12, 7, "t3");
 
 //Diameter
 NexText tDim = NexText(2, 32, "tDim");
@@ -794,7 +784,106 @@ void bAnalisaCB(void *ptr) {
 }
 
 void bSimpanCB(void *ptr) {
+  //GET VALUE FROM LCD
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tTinggi.getText(txtSensorSV, LentxtSensorSV);
+  String tTinggi = txtSensorSV;
 
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tTingStat.getText(txtSensorSV, LentxtSensorSV);
+  String tTingStat = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tDim.getText(txtSensorSV, LentxtSensorSV);
+  String tDim = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tDimStat.getText(txtSensorSV, LentxtSensorSV);
+  String tDimStat = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tPjgTing.getText(txtSensorSV, LentxtSensorSV);
+  String tPjgTing = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tPjg.getText(txtSensorSV, LentxtSensorSV);
+  String tPjg = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tPjgStat.getText(txtSensorSV, LentxtSensorSV);
+  String tPjgStat = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tHdrat.getText(txtSensorSV, LentxtSensorSV);
+  String tHdrat = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tHdratStat.getText(txtSensorSV, LentxtSensorSV);
+  String tHdratStat = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tJmlDaun.getText(txtSensorSV, LentxtSensorSV);
+  String tJmlDaun = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tJmlDaunStat.getText(txtSensorSV, LentxtSensorSV);
+  String tJmlDaunStat = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tKelTanah.getText(txtSensorSV, LentxtSensorSV);
+  String tKelTanah = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tKelTanahStat.getText(txtSensorSV, LentxtSensorSV);
+  String tKelTanahStat = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tLulus.getText(txtSensorSV, LentxtSensorSV);
+  String tLulus = txtSensorSV;
+
+  SD.exists("DatUkr.csv");
+
+  //OPEN FILE
+  myFile = SD.open("DatUkr.csv", FILE_WRITE);
+  if (myFile) {
+    myFile.print("Acra Seedling");
+    myFile.print(',');
+    myFile.print(tTinggi);
+    myFile.print(',');
+    myFile.print(tTingStat);
+    myFile.print(',');
+    myFile.print(tDim);
+    myFile.print(',');
+    myFile.print(tDimStat);
+    myFile.print(',');
+    myFile.print(tPjgTing);
+    myFile.print(',');
+    myFile.print(tPjg);
+    myFile.print(',');
+    myFile.print(tPjgStat);
+    myFile.print(',');
+    myFile.print(tHdrat);
+    myFile.print(',');
+    myFile.print(tHdratStat);
+    myFile.print(',');
+    myFile.print(tJmlDaun);
+    myFile.print(',');
+    myFile.print(tJmlDaunStat);
+    myFile.print(',');
+    myFile.print(tKelTanah);
+    myFile.print(',');
+    myFile.print(tKelTanahStat);
+    myFile.print(',');
+    myFile.print(tLulus);
+    myFile.print(',');
+    myFile.println("");
+
+    myFile.close();
+    Serial.println("Success write data");
+  } else {
+    // if the file didn't open, print an error:
+    Serial.println("error opening DatUkr.csv");
+  }
 }
 //End OF Acra Seedling
 
@@ -976,7 +1065,106 @@ void bAnalisaCB2(void *ptr) {
 }
 
 void bSimpanCB2(void *ptr) {
+  //GET VALUE FROM LCD
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tTinggi2.getText(txtSensorSV, LentxtSensorSV);
+  String tTinggi2 = txtSensorSV;
 
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tTingStat2.getText(txtSensorSV, LentxtSensorSV);
+  String tTingStat2 = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tDim2.getText(txtSensorSV, LentxtSensorSV);
+  String tDim2 = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tDimStat2.getText(txtSensorSV, LentxtSensorSV);
+  String tDimStat2 = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tPjgTing2.getText(txtSensorSV, LentxtSensorSV);
+  String tPjgTing2 = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tPjg2.getText(txtSensorSV, LentxtSensorSV);
+  String tPjg2 = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tPjgStat2.getText(txtSensorSV, LentxtSensorSV);
+  String tPjgStat2 = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tHdrat2.getText(txtSensorSV, LentxtSensorSV);
+  String tHdrat2 = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tHdratStat2.getText(txtSensorSV, LentxtSensorSV);
+  String tHdratStat2 = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tJmlDaun2.getText(txtSensorSV, LentxtSensorSV);
+  String tJmlDaun2 = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tJmlDaunStat2.getText(txtSensorSV, LentxtSensorSV);
+  String tJmlDaunStat2 = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tKelTanah2.getText(txtSensorSV, LentxtSensorSV);
+  String tKelTanah2 = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tKelTanahStat2.getText(txtSensorSV, LentxtSensorSV);
+  String tKelTanahStat2 = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tLulus2.getText(txtSensorSV, LentxtSensorSV);
+  String tLulus2 = txtSensorSV;
+
+  SD.exists("DatUkr.csv");
+
+  //OPEN FILE
+  myFile = SD.open("DatUkr.csv", FILE_WRITE);
+  if (myFile) {
+    myFile.print("Acra Cutting");
+    myFile.print(',');
+    myFile.print(tTinggi2);
+    myFile.print(',');
+    myFile.print(tTingStat2);
+    myFile.print(',');
+    myFile.print(tDim2);
+    myFile.print(',');
+    myFile.print(tDimStat2);
+    myFile.print(',');
+    myFile.print(tPjgTing2);
+    myFile.print(',');
+    myFile.print(tPjg2);
+    myFile.print(',');
+    myFile.print(tPjgStat2);
+    myFile.print(',');
+    myFile.print(tHdrat2);
+    myFile.print(',');
+    myFile.print(tHdratStat2);
+    myFile.print(',');
+    myFile.print(tJmlDaun2);
+    myFile.print(',');
+    myFile.print(tJmlDaunStat2);
+    myFile.print(',');
+    myFile.print(tKelTanah2);
+    myFile.print(',');
+    myFile.print(tKelTanahStat2);
+    myFile.print(',');
+    myFile.print(tLulus2);
+    myFile.print(',');
+    myFile.println("");
+
+    myFile.close();
+    Serial.println("Success write data");
+  } else {
+    // if the file didn't open, print an error:
+    Serial.println("error opening DatUkr.csv");
+  }
 }
 //End Of Acra Cutting
 
@@ -1158,7 +1346,106 @@ void bAnalisaCB3(void *ptr) {
 }
 
 void bSimpanCB3(void *ptr) {
+  //GET VALUE FROM LCD
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tTinggi3.getText(txtSensorSV, LentxtSensorSV);
+  String tTinggi3 = txtSensorSV;
 
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tTingStat3.getText(txtSensorSV, LentxtSensorSV);
+  String tTingStat3 = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tDim3.getText(txtSensorSV, LentxtSensorSV);
+  String tDim3 = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tDimStat3.getText(txtSensorSV, LentxtSensorSV);
+  String tDimStat3 = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tPjgTing3.getText(txtSensorSV, LentxtSensorSV);
+  String tPjgTing3 = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tPjg3.getText(txtSensorSV, LentxtSensorSV);
+  String tPjg3 = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tPjgStat3.getText(txtSensorSV, LentxtSensorSV);
+  String tPjgStat3 = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tHdrat3.getText(txtSensorSV, LentxtSensorSV);
+  String tHdrat3 = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tHdratStat3.getText(txtSensorSV, LentxtSensorSV);
+  String tHdratStat3 = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tJmlDaun3.getText(txtSensorSV, LentxtSensorSV);
+  String tJmlDaun3 = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tJmlDaunStat3.getText(txtSensorSV, LentxtSensorSV);
+  String tJmlDaunStat3 = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tKelTanah3.getText(txtSensorSV, LentxtSensorSV);
+  String tKelTanah3 = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tKelTanahStat3.getText(txtSensorSV, LentxtSensorSV);
+  String tKelTanahStat3 = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tLulus3.getText(txtSensorSV, LentxtSensorSV);
+  String tLulus3 = txtSensorSV;
+
+  SD.exists("DatUkr.csv");
+
+  //OPEN FILE
+  myFile = SD.open("DatUkr.csv", FILE_WRITE);
+  if (myFile) {
+    myFile.print("Plastic Tube EP0077A");
+    myFile.print(',');
+    myFile.print(tTinggi3);
+    myFile.print(',');
+    myFile.print(tTingStat3);
+    myFile.print(',');
+    myFile.print(tDim3);
+    myFile.print(',');
+    myFile.print(tDimStat3);
+    myFile.print(',');
+    myFile.print(tPjgTing3);
+    myFile.print(',');
+    myFile.print(tPjg3);
+    myFile.print(',');
+    myFile.print(tPjgStat3);
+    myFile.print(',');
+    myFile.print(tHdrat3);
+    myFile.print(',');
+    myFile.print(tHdratStat3);
+    myFile.print(',');
+    myFile.print(tJmlDaun3);
+    myFile.print(',');
+    myFile.print(tJmlDaunStat3);
+    myFile.print(',');
+    myFile.print(tKelTanah3);
+    myFile.print(',');
+    myFile.print(tKelTanahStat3);
+    myFile.print(',');
+    myFile.print(tLulus3);
+    myFile.print(',');
+    myFile.println("");
+
+    myFile.close();
+    Serial.println("Success write data");
+  } else {
+    // if the file didn't open, print an error:
+    Serial.println("error opening DatUkr.csv");
+  }
 }
 //End Of EP0077A PT
 
@@ -1340,7 +1627,106 @@ void bAnalisaCB4(void *ptr) {
 }
 
 void bSimpanCB4(void *ptr) {
+  //GET VALUE FROM LCD
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tTinggi4.getText(txtSensorSV, LentxtSensorSV);
+  String tTinggi4 = txtSensorSV;
 
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tTingStat4.getText(txtSensorSV, LentxtSensorSV);
+  String tTingStat4 = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tDim4.getText(txtSensorSV, LentxtSensorSV);
+  String tDim4 = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tDimStat4.getText(txtSensorSV, LentxtSensorSV);
+  String tDimStat4 = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tPjgTing4.getText(txtSensorSV, LentxtSensorSV);
+  String tPjgTing4 = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tPjg4.getText(txtSensorSV, LentxtSensorSV);
+  String tPjg4 = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tPjgStat4.getText(txtSensorSV, LentxtSensorSV);
+  String tPjgStat4 = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tHdrat4.getText(txtSensorSV, LentxtSensorSV);
+  String tHdrat4 = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tHdratStat4.getText(txtSensorSV, LentxtSensorSV);
+  String tHdratStat4 = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tJmlDaun4.getText(txtSensorSV, LentxtSensorSV);
+  String tJmlDaun4 = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tJmlDaunStat4.getText(txtSensorSV, LentxtSensorSV);
+  String tJmlDaunStat4 = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tKelTanah4.getText(txtSensorSV, LentxtSensorSV);
+  String tKelTanah4 = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tKelTanahStat4.getText(txtSensorSV, LentxtSensorSV);
+  String tKelTanahStat4 = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tLulus4.getText(txtSensorSV, LentxtSensorSV);
+  String tLulus4 = txtSensorSV;
+
+  SD.exists("DatUkr.csv");
+
+  //OPEN FILE
+  myFile = SD.open("DatUkr.csv", FILE_WRITE);
+  if (myFile) {
+    myFile.print("Plastic Tube EP0361WK");
+    myFile.print(',');
+    myFile.print(tTinggi4);
+    myFile.print(',');
+    myFile.print(tTingStat4);
+    myFile.print(',');
+    myFile.print(tDim4);
+    myFile.print(',');
+    myFile.print(tDimStat4);
+    myFile.print(',');
+    myFile.print(tPjgTing4);
+    myFile.print(',');
+    myFile.print(tPjg4);
+    myFile.print(',');
+    myFile.print(tPjgStat4);
+    myFile.print(',');
+    myFile.print(tHdrat4);
+    myFile.print(',');
+    myFile.print(tHdratStat4);
+    myFile.print(',');
+    myFile.print(tJmlDaun4);
+    myFile.print(',');
+    myFile.print(tJmlDaunStat4);
+    myFile.print(',');
+    myFile.print(tKelTanah4);
+    myFile.print(',');
+    myFile.print(tKelTanahStat4);
+    myFile.print(',');
+    myFile.print(tLulus4);
+    myFile.print(',');
+    myFile.println("");
+
+    myFile.close();
+    Serial.println("Success write data");
+  } else {
+    // if the file didn't open, print an error:
+    Serial.println("error opening DatUkr.csv");
+  }
 }
 //End Of EP0361WK PT
 
@@ -1522,7 +1908,106 @@ void bAnalisaCB5(void *ptr) {
 }
 
 void bSimpanCB5(void *ptr) {
+  //GET VALUE FROM LCD
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tTinggi5.getText(txtSensorSV, LentxtSensorSV);
+  String tTinggi5 = txtSensorSV;
 
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tTingStat5.getText(txtSensorSV, LentxtSensorSV);
+  String tTingStat5 = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tDim5.getText(txtSensorSV, LentxtSensorSV);
+  String tDim5 = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tDimStat5.getText(txtSensorSV, LentxtSensorSV);
+  String tDimStat5 = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tPjgTing5.getText(txtSensorSV, LentxtSensorSV);
+  String tPjgTing5 = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tPjg5.getText(txtSensorSV, LentxtSensorSV);
+  String tPjg5 = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tPjgStat5.getText(txtSensorSV, LentxtSensorSV);
+  String tPjgStat5 = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tHdrat5.getText(txtSensorSV, LentxtSensorSV);
+  String tHdrat5 = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tHdratStat5.getText(txtSensorSV, LentxtSensorSV);
+  String tHdratStat5 = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tJmlDaun5.getText(txtSensorSV, LentxtSensorSV);
+  String tJmlDaun5 = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tJmlDaunStat5.getText(txtSensorSV, LentxtSensorSV);
+  String tJmlDaunStat5 = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tKelTanah5.getText(txtSensorSV, LentxtSensorSV);
+  String tKelTanah5 = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tKelTanahStat5.getText(txtSensorSV, LentxtSensorSV);
+  String tKelTanahStat5 = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tLulus5.getText(txtSensorSV, LentxtSensorSV);
+  String tLulus5 = txtSensorSV;
+
+  SD.exists("DatUkr.csv");
+
+  //OPEN FILE
+  myFile = SD.open("DatUkr.csv", FILE_WRITE);
+  if (myFile) {
+    myFile.print("Plastic Tube Clone");
+    myFile.print(',');
+    myFile.print(tTinggi5);
+    myFile.print(',');
+    myFile.print(tTingStat5);
+    myFile.print(',');
+    myFile.print(tDim5);
+    myFile.print(',');
+    myFile.print(tDimStat5);
+    myFile.print(',');
+    myFile.print(tPjgTing5);
+    myFile.print(',');
+    myFile.print(tPjg5);
+    myFile.print(',');
+    myFile.print(tPjgStat5);
+    myFile.print(',');
+    myFile.print(tHdrat5);
+    myFile.print(',');
+    myFile.print(tHdratStat5);
+    myFile.print(',');
+    myFile.print(tJmlDaun5);
+    myFile.print(',');
+    myFile.print(tJmlDaunStat5);
+    myFile.print(',');
+    myFile.print(tKelTanah5);
+    myFile.print(',');
+    myFile.print(tKelTanahStat5);
+    myFile.print(',');
+    myFile.print(tLulus5);
+    myFile.print(',');
+    myFile.println("");
+
+    myFile.close();
+    Serial.println("Success write data");
+  } else {
+    // if the file didn't open, print an error:
+    Serial.println("error opening DatUkr.csv");
+  }
 }
 //End Of CLONE PT
 
@@ -1705,7 +2190,106 @@ void bAnalisaCB6(void *ptr) {
 }
 
 void bSimpanCB6(void *ptr) {
+  //GET VALUE FROM LCD
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tTinggi6.getText(txtSensorSV, LentxtSensorSV);
+  String tTinggi6 = txtSensorSV;
 
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tTingStat6.getText(txtSensorSV, LentxtSensorSV);
+  String tTingStat6 = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tDim6.getText(txtSensorSV, LentxtSensorSV);
+  String tDim6 = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tDimStat6.getText(txtSensorSV, LentxtSensorSV);
+  String tDimStat6 = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tPjgTing6.getText(txtSensorSV, LentxtSensorSV);
+  String tPjgTing6 = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tPjg6.getText(txtSensorSV, LentxtSensorSV);
+  String tPjg6 = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tPjgStat6.getText(txtSensorSV, LentxtSensorSV);
+  String tPjgStat6 = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tHdrat6.getText(txtSensorSV, LentxtSensorSV);
+  String tHdrat6 = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tHdratStat6.getText(txtSensorSV, LentxtSensorSV);
+  String tHdratStat6 = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tJmlDaun6.getText(txtSensorSV, LentxtSensorSV);
+  String tJmlDaun6 = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tJmlDaunStat6.getText(txtSensorSV, LentxtSensorSV);
+  String tJmlDaunStat6 = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tKelTanah6.getText(txtSensorSV, LentxtSensorSV);
+  String tKelTanah6 = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tKelTanahStat6.getText(txtSensorSV, LentxtSensorSV);
+  String tKelTanahStat6 = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tLulus6.getText(txtSensorSV, LentxtSensorSV);
+  String tLulus6 = txtSensorSV;
+
+  SD.exists("DatUkr.csv");
+
+  //OPEN FILE
+  myFile = SD.open("DatUkr.csv", FILE_WRITE);
+  if (myFile) {
+    myFile.print("Paper pot EP0077AA");
+    myFile.print(',');
+    myFile.print(tTinggi6);
+    myFile.print(',');
+    myFile.print(tTingStat6);
+    myFile.print(',');
+    myFile.print(tDim6);
+    myFile.print(',');
+    myFile.print(tDimStat6);
+    myFile.print(',');
+    myFile.print(tPjgTing6);
+    myFile.print(',');
+    myFile.print(tPjg6);
+    myFile.print(',');
+    myFile.print(tPjgStat6);
+    myFile.print(',');
+    myFile.print(tHdrat6);
+    myFile.print(',');
+    myFile.print(tHdratStat6);
+    myFile.print(',');
+    myFile.print(tJmlDaun6);
+    myFile.print(',');
+    myFile.print(tJmlDaunStat6);
+    myFile.print(',');
+    myFile.print(tKelTanah6);
+    myFile.print(',');
+    myFile.print(tKelTanahStat6);
+    myFile.print(',');
+    myFile.print(tLulus6);
+    myFile.print(',');
+    myFile.println("");
+
+    myFile.close();
+    Serial.println("Success write data");
+  } else {
+    // if the file didn't open, print an error:
+    Serial.println("error opening DatUkr.csv");
+  }
 }
 //End Of EP0077AA PP
 
@@ -1888,7 +2472,106 @@ void bAnalisaCB7(void *ptr) {
 }
 
 void bSimpanCB7(void *ptr) {
+  //GET VALUE FROM LCD
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tTinggi7.getText(txtSensorSV, LentxtSensorSV);
+  String tTinggi7 = txtSensorSV;
 
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tTingStat7.getText(txtSensorSV, LentxtSensorSV);
+  String tTingStat7 = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tDim7.getText(txtSensorSV, LentxtSensorSV);
+  String tDim7 = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tDimStat7.getText(txtSensorSV, LentxtSensorSV);
+  String tDimStat7 = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tPjgTing7.getText(txtSensorSV, LentxtSensorSV);
+  String tPjgTing7 = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tPjg7.getText(txtSensorSV, LentxtSensorSV);
+  String tPjg7 = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tPjgStat7.getText(txtSensorSV, LentxtSensorSV);
+  String tPjgStat7 = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tHdrat7.getText(txtSensorSV, LentxtSensorSV);
+  String tHdrat7 = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tHdratStat7.getText(txtSensorSV, LentxtSensorSV);
+  String tHdratStat7 = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tJmlDaun8.getText(txtSensorSV, LentxtSensorSV);
+  String tJmlDaun7 = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tJmlDaunStat7.getText(txtSensorSV, LentxtSensorSV);
+  String tJmlDaunStat7 = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tKelTanah7.getText(txtSensorSV, LentxtSensorSV);
+  String tKelTanah7 = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tKelTanahStat7.getText(txtSensorSV, LentxtSensorSV);
+  String tKelTanahStat7 = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tLulus7.getText(txtSensorSV, LentxtSensorSV);
+  String tLulus7 = txtSensorSV;
+
+  SD.exists("DatUkr.csv");
+
+  //OPEN FILE
+  myFile = SD.open("DatUkr.csv", FILE_WRITE);
+  if (myFile) {
+    myFile.print("Paper pot EP0361WK");
+    myFile.print(',');
+    myFile.print(tTinggi7);
+    myFile.print(',');
+    myFile.print(tTingStat7);
+    myFile.print(',');
+    myFile.print(tDim7);
+    myFile.print(',');
+    myFile.print(tDimStat7);
+    myFile.print(',');
+    myFile.print(tPjgTing7);
+    myFile.print(',');
+    myFile.print(tPjg7);
+    myFile.print(',');
+    myFile.print(tPjgStat7);
+    myFile.print(',');
+    myFile.print(tHdrat7);
+    myFile.print(',');
+    myFile.print(tHdratStat7);
+    myFile.print(',');
+    myFile.print(tJmlDaun7);
+    myFile.print(',');
+    myFile.print(tJmlDaunStat7);
+    myFile.print(',');
+    myFile.print(tKelTanah7);
+    myFile.print(',');
+    myFile.print(tKelTanahStat7);
+    myFile.print(',');
+    myFile.print(tLulus7);
+    myFile.print(',');
+    myFile.println("");
+
+    myFile.close();
+    Serial.println("Success write data");
+  } else {
+    // if the file didn't open, print an error:
+    Serial.println("error opening DatUkr.csv");
+  }
 }
 //End Of EP0361WK PP
 
@@ -2072,7 +2755,106 @@ void bAnalisaCB8(void *ptr) {
 }
 
 void bSimpanCB8(void *ptr) {
+  //GET VALUE FROM LCD
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tTinggi8.getText(txtSensorSV, LentxtSensorSV);
+  String tTinggi8 = txtSensorSV;
 
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tTingStat8.getText(txtSensorSV, LentxtSensorSV);
+  String tTingStat8 = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tDim8.getText(txtSensorSV, LentxtSensorSV);
+  String tDim8 = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tDimStat8.getText(txtSensorSV, LentxtSensorSV);
+  String tDimStat8 = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tPjgTing8.getText(txtSensorSV, LentxtSensorSV);
+  String tPjgTing8 = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tPjg8.getText(txtSensorSV, LentxtSensorSV);
+  String tPjg8 = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tPjgStat8.getText(txtSensorSV, LentxtSensorSV);
+  String tPjgStat8 = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tHdrat8.getText(txtSensorSV, LentxtSensorSV);
+  String tHdrat8 = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tHdratStat8.getText(txtSensorSV, LentxtSensorSV);
+  String tHdratStat8 = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tJmlDaun8.getText(txtSensorSV, LentxtSensorSV);
+  String tJmlDaun8 = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tJmlDaunStat8.getText(txtSensorSV, LentxtSensorSV);
+  String tJmlDaunStat8 = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tKelTanah8.getText(txtSensorSV, LentxtSensorSV);
+  String tKelTanah8 = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tKelTanahStat8.getText(txtSensorSV, LentxtSensorSV);
+  String tKelTanahStat8 = txtSensorSV;
+
+  memset(txtSensorSV, 0, sizeof txtSensorSV);
+  tLulus8.getText(txtSensorSV, LentxtSensorSV);
+  String tLulus8 = txtSensorSV;
+
+  SD.exists("DatUkr.csv");
+
+  //OPEN FILE
+  myFile = SD.open("DatUkr.csv", FILE_WRITE);
+  if (myFile) {
+    myFile.print("Paper pot clone");
+    myFile.print(',');
+    myFile.print(tTinggi8);
+    myFile.print(',');
+    myFile.print(tTingStat8);
+    myFile.print(',');
+    myFile.print(tDim8);
+    myFile.print(',');
+    myFile.print(tDimStat8);
+    myFile.print(',');
+    myFile.print(tPjgTing8);
+    myFile.print(',');
+    myFile.print(tPjg8);
+    myFile.print(',');
+    myFile.print(tPjgStat8);
+    myFile.print(',');
+    myFile.print(tHdrat8);
+    myFile.print(',');
+    myFile.print(tHdratStat8);
+    myFile.print(',');
+    myFile.print(tJmlDaun8);
+    myFile.print(',');
+    myFile.print(tJmlDaunStat8);
+    myFile.print(',');
+    myFile.print(tKelTanah8);
+    myFile.print(',');
+    myFile.print(tKelTanahStat8);
+    myFile.print(',');
+    myFile.print(tLulus8);
+    myFile.print(',');
+    myFile.println("");
+
+    myFile.close();
+    Serial.println("Success write data");
+  } else {
+    // if the file didn't open, print an error:
+    Serial.println("error opening DatUkr.csv");
+  }
 }
 //End Of CLONE PP
 
@@ -2108,7 +2890,6 @@ void bSimpanCB9(void *ptr) {
   //OPEN FILE
   myFile = SD.open("DatSel.csv", FILE_WRITE);
   if (myFile) {
-    myFile.print(',');
     myFile.print(tTinggi9);
     myFile.print(',');
     myFile.print(tGrade9);
@@ -2138,7 +2919,6 @@ void bSimpanCB10(void *ptr) {
   //OPEN FILE
   myFile = SD.open("DatDim.csv", FILE_WRITE);
   if (myFile) {
-    myFile.print(',');
     myFile.print(tDim);
     myFile.print(',');
     myFile.println("");
