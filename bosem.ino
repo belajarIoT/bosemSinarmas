@@ -16,7 +16,7 @@ unsigned long time_now;
 char txSensorSV[10] = {'0'};
 char result[10] = {0};
 
-float batasBawah = 40;
+float batasBawah = 400;
 // Pin Declarations
 int DATA_PIN = 4;
 int CLOCK_PIN = 5;
